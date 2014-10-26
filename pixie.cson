@@ -1,0 +1,3 @@
+version: "0.1.0"
+dependencies:
+  cornerstone: "distri/cornerstone:v0.2.4"

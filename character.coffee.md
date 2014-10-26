@@ -1,0 +1,252 @@
+Character
+=========
+
+    require "cornerstone"
+
+Those little guys that run around.
+
+    {sqrt, min, max} = Math
+
+    module.exports = (I={}, self=Core(I)) ->
+      defaults I,
+        abilities: [
+          "Move"
+          "Melee"
+        ]
+        actions: 2
+        alive: true
+        cooldowns: {}
+        effects: []
+        health: 3
+        healthMax: 3
+        magicalVision: []
+        movement: 4
+        name: "Duder"
+        passives: []
+        physicalAwareness: sqrt(2)
+        position:
+          x: 0
+          y: 0
+        sight: 7
+        strength: 1
+        stun: 0
+        type: "Grunt"
+
+      self.include Model
+
+      self.attrAccessor(
+        "abilities"
+        "actions"
+        "alive"
+        "cooldowns"
+        "debugPositions"
+        "health"
+        "healthMax"
+        "movement"
+        "name"
+        "physicalAwareness"
+        "sight"
+        "strength"
+        "type"
+      )
+
+      self.attrModel "position", Point
+      self.attrModels "magicalVision", Point
+
+      effectModifiable = (names...) ->
+        names.forEach (name) ->
+          method = self[name]
+
+          self[name] = (args...) ->
+            if args.length > 0
+              method(args...)
+            else
+              method() + self.mods(name)
+
+      effectModifiable(
+        "sight"
+        "strength"
+      )
+
+      extend self,
+        damage: (amount, type) ->
+          damageTotal = self.damageMod(amount, type)
+
+          I.health -= damageTotal
+
+        heal: (amount) ->
+          I.health += amount
+
+        cooldown: (ability) ->
+          I.cooldowns[ability.name()] or 0
+
+        setCooldown: (ability) ->
+          I.cooldowns[ability.name()] = ability.cooldown()
+
+        addMagicalVision: (position) ->
+          self.magicalVision().push position
+
+        addEffect: (effect) ->
+          I.effects.push effect
+
+Sums up the modifications for an attribute from all the effects.
+
+        mods: (attribute) ->
+          I.effects.reduce (total, effect) ->
+            if effect.attribute is attribute
+              total + effect.amount
+            else
+              total
+          , 0
+
+        damageMod: (amount, type="Physical") ->
+          if self.immune(type)
+            return 0
+
+          # TODO: Resistances
+
+          return amount
+
+        immune: (type) ->
+          self.immunities().include(type)
+
+        immunities: (type) ->
+          self.passives().map (passive) ->
+            passive.immune
+          .compact()
+
+        stateBasedActions: ({addEffect}) ->
+          return if !I.alive
+
+          # Clear expired effects
+          I.effects = I.effects.filter (effect) ->
+            effect.duration > 0
+
+          # Cap health
+          if I.health > I.healthMax
+            I.health = I.healthMax
+
+          # TODO: Move into a state based effect?
+          if I.health <= 0
+            # Died
+            I.alive = false
+            I.actions = 0
+
+          # Clamping actions and cooldowns
+          Object.keys(I.cooldowns).forEach (name) ->
+            if I.cooldowns[name] < 0
+              I.cooldowns[name] = 0
+
+          if I.stun < 0
+            I.stun = 0
+
+          return
+
+        stun: (stun) ->
+          console.log "#1 Stunna", stun
+          I.stun = Math.max(I.stun, stun)
+          I.actions = 0
+
+        stunned: ->
+          I.stun > 0
+
+        aware: () ->
+          self.alive() and !self.stunned()
+
+Effects to occur when this character enters a tile.
+
+        enterEffects: ->
+          self.passives().map (passive) ->
+            passive.enter
+          .compact()
+
+        visionEffects: ->
+          self.passives().map (passive) ->
+            passive.visionEffect
+          .compact()
+
+        physicalAwareness: ->
+          if !self.aware()
+            0
+          else
+            I.physicalAwareness + self.mods(name)
+
+        targettingAbility: Observable()
+        resetTargetting: ->
+          self.targettingAbility null
+
+Ready is called at the beginning of each turn. It resets the actions and processes
+any status effects.
+
+        ready: ->
+          # Remove all magical vision
+          # TODO: Maybe have separate vision effects with their own durations
+          self.magicalVision []
+
+          I.stun -= 1 if I.stun > 0
+
+          Object.keys(I.cooldowns).forEach (name) ->
+            I.cooldowns[name] -= 1
+
+          I.effects.forEach (effect) ->
+            # TODO: Migrate into CharacterEffect class
+            effect.update?(self)
+            effect.duration -= 1
+
+          if I.stun is 0
+            I.actions = 2
+          else
+            I.actions = 0
+
+        passives: ->
+          I.passives.map (name) ->
+            if passive = Passive.Passives[name]
+              passive
+            else
+              console.warn "Undefined Passive: '#{name}'"
+          .compact()
+
+        visionType: ->
+          type = self.passives().reduce (memo, passive) ->
+            memo or passive.visionType
+          , undefined
+
+          type or "sight"
+
+        toJSON: ->
+          console.log self.position()
+
+          Object.extend I,
+            position: self.position()
+
+      return self
+
+    dataTransform = (data) ->
+      Object.extend data,
+        healthMax: data.healthmax
+        abilities: data.abilities.split(',')
+        passives: (data.passives ? "").split(',')
+        spriteName: data.sprite
+
+      # TODO: May want to move these into the class constructor
+      #
+      [
+        "actions"
+        "healthMax"
+        "movement"
+        "sight"
+      ].forEach (name) ->
+        data[name] = parseFloat(data[name])
+
+      delete data.healthmax
+      delete data.sprite
+
+      return data
+
+    module.exports.dataFromRemote = (data) ->
+      results = {}
+      data.forEach (datum) ->
+        results[datum.name] = dataTransform(datum)
+
+
+      return results
