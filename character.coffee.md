@@ -1,6 +1,7 @@
 Character
 =========
 
+    require "./lib/extensions"
     require "cornerstone"
 
 Those little guys that run around.
@@ -50,7 +51,7 @@ Those little guys that run around.
         "type"
       )
 
-      self.attrModel "position", Point
+      self.attrData "position", Point
       self.attrModels "magicalVision", Point
 
       effectModifiable = (names...) ->
@@ -212,12 +213,6 @@ any status effects.
           , undefined
 
           type or "sight"
-
-        toJSON: ->
-          console.log self.position()
-
-          Object.extend I,
-            position: self.position()
 
       return self
 
