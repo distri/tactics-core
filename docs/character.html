@@ -113,7 +113,7 @@ module.<span class="function"><span class="title">exports</span></span> = (I={},
 
   extend self,
     damage: (amount, type) -&gt;
-      damageTotal = self.damageMod(amount, type)
+      damageTotal = self.modifiedDamage(amount, type)
 
       I.health -= damageTotal
 
@@ -151,13 +151,21 @@ module.<span class="function"><span class="title">exports</span></span> = (I={},
           total
       , <span class="number">0</span>
 
-    damageMod: (amount, type=<span class="string">"Physical"</span>) -&gt;
+    modifiedDamage: (amount, type=<span class="string">"Physical"</span>) -&gt;
       <span class="keyword">if</span> self.immune(type)
         <span class="keyword">return</span> <span class="number">0</span>
 
-      <span class="comment"># TODO: Resistances</span>
+      <span class="comment"># Resistances</span>
+      amount = (amount * (<span class="number">1</span> - self.resistance(type))).clamp(<span class="number">0</span>, amount)
 
       <span class="keyword">return</span> amount
+
+    resistance: (type) -&gt;
+      I.effects.filter (effect) -&gt;
+        effect.type <span class="keyword">is</span> type <span class="keyword">and</span> effect.resistance
+      .reduce (total, effect) -&gt;
+        total + effect.resistance
+      , <span class="number">0</span>
 
     immune: (type) -&gt;
       self.immunities().include(type)
@@ -167,7 +175,7 @@ module.<span class="function"><span class="title">exports</span></span> = (I={},
         passive.immune
       .compact()
 
-    stateBasedActions: ({addEffect}) -&gt;
+    stateBasedActions: -&gt;
       <span class="keyword">return</span> <span class="keyword">if</span> !I.alive
 
       <span class="comment"># Clear expired effects</span>
