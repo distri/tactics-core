@@ -20,7 +20,6 @@ Those little guys that run around.
         effects: []
         health: 3
         healthMax: 3
-        magicalVision: []
         movement: 4
         name: "Duder"
         passives: []
@@ -52,7 +51,6 @@ Those little guys that run around.
       )
 
       self.attrData "position", Point
-      self.attrModels "magicalVision", Point
 
       effectModifiable = (names...) ->
         names.forEach (name) ->
@@ -84,8 +82,6 @@ Those little guys that run around.
         setCooldown: (ability) ->
           I.cooldowns[ability.name()] = ability.cooldown()
 
-        addMagicalVision: (position) ->
-          self.magicalVision().push position
 
         addEffect: (effect) ->
           I.effects.push effect
@@ -152,7 +148,6 @@ Sums up the modifications for an attribute from all the effects.
           return
 
         stun: (stun) ->
-          console.log "#1 Stunna", stun
           I.stun = Math.max(I.stun, stun)
           I.actions = 0
 
@@ -188,10 +183,6 @@ Ready is called at the beginning of each turn. It resets the actions and process
 any status effects.
 
         ready: ->
-          # Remove all magical vision
-          # TODO: Maybe have separate vision effects with their own durations
-          self.magicalVision []
-
           I.stun -= 1 if I.stun > 0
 
           Object.keys(I.cooldowns).forEach (name) ->
@@ -250,6 +241,5 @@ any status effects.
       results = {}
       data.forEach (datum) ->
         results[datum.name] = dataTransform(datum)
-
 
       return results
