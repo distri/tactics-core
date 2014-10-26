@@ -30,25 +30,35 @@ Those little guys that run around.
         sight: 7
         strength: 1
         stun: 0
-        type: "Grunt"
 
       self.include Model
 
       self.attrAccessor(
         "abilities"
-        "actions"
         "alive"
         "cooldowns"
         "debugPositions"
-        "health"
-        "healthMax"
         "movement"
         "name"
         "physicalAwareness"
+      )
+
+      ensureNumber = (value) ->
+        result = parseFloat(value)
+
+        throw "Invalid number" if isNaN result 
+
+        return result
+
+      [
+        "actions"
+        "health"
+        "healthMax"
+        "movement"
         "sight"
         "strength"
-        "type"
-      )
+      ].forEach (name) ->
+        self.attrData name, ensureNumber
 
       self.attrData "position", Point
 
@@ -224,17 +234,7 @@ any status effects.
         abilities: data.abilities.split(',')
         passives: (data.passives ? "").split(',')
         spriteName: data.sprite
-
-      # TODO: May want to move these into the class constructor
-      #
-      [
-        "actions"
-        "healthMax"
-        "movement"
-        "sight"
-      ].forEach (name) ->
-        data[name] = parseFloat(data[name])
-
+      
       delete data.healthmax
       delete data.sprite
 
