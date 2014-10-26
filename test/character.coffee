@@ -35,3 +35,11 @@ describe "Character", ->
       type: "Fire"
 
     assert.equal character.modifiedDamage(999, "Fire"), 0
+
+  it "should die when taking a boatload of damage", ->
+    boatload = 999
+
+    character.damage boatload
+    character.stateBasedActions()
+
+    assert character.dead()

@@ -67,11 +67,14 @@ Those little guys that run around.
         "strength"
       )
 
-      extend self,
+      self.extend
         damage: (amount, type) ->
           damageTotal = self.modifiedDamage(amount, type)
 
           I.health -= damageTotal
+
+        dead: ->
+          !self.alive()
 
         heal: (amount) ->
           I.health += amount
