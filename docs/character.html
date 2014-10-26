@@ -62,7 +62,6 @@ module.<span class="function"><span class="title">exports</span></span> = (I={},
     effects: []
     health: <span class="number">3</span>
     healthMax: <span class="number">3</span>
-    magicalVision: []
     movement: <span class="number">4</span>
     name: <span class="string">"Duder"</span>
     passives: []
@@ -94,7 +93,6 @@ module.<span class="function"><span class="title">exports</span></span> = (I={},
   )
 
   self.attrData <span class="string">"position"</span>, Point
-  self.attrModels <span class="string">"magicalVision"</span>, Point
 
   <span class="function"><span class="title">effectModifiable</span></span> = (names...) -&gt;
     names.forEach (name) -&gt;
@@ -126,8 +124,6 @@ module.<span class="function"><span class="title">exports</span></span> = (I={},
     setCooldown: (ability) -&gt;
       I.cooldowns[ability.name()] = ability.cooldown()
 
-    addMagicalVision: (position) -&gt;
-      self.magicalVision().push position
 
     addEffect: (effect) -&gt;
       I.effects.push effect</code></pre>
@@ -203,7 +199,6 @@ module.<span class="function"><span class="title">exports</span></span> = (I={},
       <span class="keyword">return</span>
 
     stun: (stun) -&gt;
-      console.log <span class="string">"#1 Stunna"</span>, stun
       I.stun = Math.max(I.stun, stun)
       I.actions = <span class="number">0</span>
 
@@ -257,10 +252,6 @@ any status effects.</p>
 
             </div>
             <div class="content"><pre><code class="lang-coffeescript">    ready: -&gt;
-      <span class="comment"># Remove all magical vision</span>
-      <span class="comment"># TODO: Maybe have separate vision effects with their own durations</span>
-      self.magicalVision []
-
       I.stun -= <span class="number">1</span> <span class="keyword">if</span> I.stun &gt; <span class="number">0</span>
 
       Object.keys(I.cooldowns).forEach (name) -&gt;
@@ -319,7 +310,6 @@ module.exports.<span class="function"><span class="title">dataFromRemote</span><
   results = {}
   data.forEach (datum) -&gt;
     results[datum.name] = dataTransform(datum)
-
 
   <span class="keyword">return</span> results</code></pre>
 </div>
