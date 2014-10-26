@@ -34,7 +34,8 @@
               </div>
               
             </div>
-            <div class="content"><pre><code class="lang-coffeescript">require <span class="string">"cornerstone"</span></code></pre>
+            <div class="content"><pre><code class="lang-coffeescript">require <span class="string">"./lib/extensions"</span>
+require <span class="string">"cornerstone"</span></code></pre>
 </div>
         </li>
         
@@ -92,7 +93,7 @@ module.<span class="function"><span class="title">exports</span></span> = (I={},
     <span class="string">"type"</span>
   )
 
-  self.attrModel <span class="string">"position"</span>, Point
+  self.attrData <span class="string">"position"</span>, Point
   self.attrModels <span class="string">"magicalVision"</span>, Point
 
   <span class="function"><span class="title">effectModifiable</span></span> = (names...) -&gt;
@@ -281,12 +282,6 @@ any status effects.</p>
       , <span class="literal">undefined</span>
 
       type <span class="keyword">or</span> <span class="string">"sight"</span>
-
-    toJSON: -&gt;
-      console.log self.position()
-
-      Object.extend I,
-        position: self.position()
 
   <span class="keyword">return</span> self
 
