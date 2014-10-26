@@ -109,11 +109,14 @@ module.<span class="function"><span class="title">exports</span></span> = (I={},
     <span class="string">"strength"</span>
   )
 
-  extend self,
+  self.extend
     damage: (amount, type) -&gt;
       damageTotal = self.modifiedDamage(amount, type)
 
       I.health -= damageTotal
+
+    dead: -&gt;
+      !self.alive()
 
     heal: (amount) -&gt;
       I.health += amount
