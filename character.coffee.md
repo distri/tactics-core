@@ -71,7 +71,7 @@ Those little guys that run around.
 
       extend self,
         damage: (amount, type) ->
-          damageTotal = self.damageMod(amount, type)
+          damageTotal = self.modifiedDamage(amount, type)
 
           I.health -= damageTotal
 
@@ -100,13 +100,21 @@ Sums up the modifications for an attribute from all the effects.
               total
           , 0
 
-        damageMod: (amount, type="Physical") ->
+        modifiedDamage: (amount, type="Physical") ->
           if self.immune(type)
             return 0
 
-          # TODO: Resistances
+          # Resistances
+          amount = (amount * (1 - self.resistance(type))).clamp(0, amount)
 
           return amount
+
+        resistance: (type) ->
+          I.effects.filter (effect) ->
+            effect.type is type and effect.resistance
+          .reduce (total, effect) ->
+            total + effect.resistance
+          , 0
 
         immune: (type) ->
           self.immunities().include(type)
@@ -116,7 +124,7 @@ Sums up the modifications for an attribute from all the effects.
             passive.immune
           .compact()
 
-        stateBasedActions: ({addEffect}) ->
+        stateBasedActions: ->
           return if !I.alive
 
           # Clear expired effects

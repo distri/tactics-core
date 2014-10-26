@@ -16,3 +16,22 @@ describe "Character", ->
     assert.equal character.I.position.x, 5
 
     assert.equal character.toJSON().position.x, 5
+
+  it "should process state based actions", ->
+    character.stateBasedActions()
+
+  it "should be able to have stats modified by effects", ->
+    assert.equal character.mods("strength"), 0
+
+    character.addEffect
+      attribute: "strength"
+      amount: -3
+
+    assert.equal character.mods("strength"), -3
+
+  it "effects should be able to provide damage immunity", ->
+    character.addEffect
+      resistance: 1
+      type: "Fire"
+
+    assert.equal character.modifiedDamage(999, "Fire"), 0
