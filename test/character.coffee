@@ -11,7 +11,7 @@ describe "Character", ->
 
   it "should serialize position to JSON", ->
     character.position Point(5, 2)
-    
+
     assert character.I.position
     assert.equal character.I.position.x, 5
 

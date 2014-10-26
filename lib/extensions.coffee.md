@@ -16,7 +16,7 @@ Adding an attrData method to the Model module.
           extend self,
 
 `attrData` models an attribute as a data object. For example if our object has
-a position attribute with x and y values we can do 
+a position attribute with x and y values we can do
 
 >     self.attrData("position", Point)
 
