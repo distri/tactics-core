@@ -297,30 +297,7 @@ any status effects.</p>
 
       type <span class="keyword">or</span> <span class="string">"sight"</span>
 
-  <span class="keyword">return</span> self
-
-<span class="function"><span class="title">dataTransform</span></span> = (data) -&gt;
-  extend data,
-    healthMax: data.healthmax
-    abilities: data.abilities.split(<span class="string">','</span>)
-    passives: (data.passives ? <span class="string">""</span>).split(<span class="string">','</span>)
-    spriteName: data.sprite
-
-  <span class="keyword">delete</span> data.healthmax
-  <span class="keyword">delete</span> data.sprite
-
-  <span class="keyword">return</span> data
-
-<span class="function"><span class="title">fromRemote</span></span> = (data) -&gt;
-  results = {}
-  data.forEach (datum) -&gt;
-    results[datum.name] = dataTransform(datum)
-
-  <span class="keyword">return</span> results
-
-module.exports.<span class="function"><span class="title">loadData</span></span> = -&gt;
-  Spreadsheet.load(<span class="string">"0ArtCBkZR37MmdFJqbjloVEp1OFZLWDJ6M29OcXQ1WkE"</span>).<span class="keyword">then</span> (data) -&gt;
-    fromRemote data.Characters</code></pre>
+  <span class="keyword">return</span> self</code></pre>
 </div>
         </li>
         
