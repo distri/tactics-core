@@ -192,7 +192,7 @@
     },
     "lib/engine.coffee.md": {
       "path": "lib/engine.coffee.md",
-      "content": "Engine\n======\n\n    module.exports = (I={}, self={}) ->\n      defaults I,\n        dt: 1/60\n        t: 0\n        paused: false\n        running: false\n\n      step = ->\n        unless I.paused\n          self.update?(I.t, I.dt)\n\n        self.render?(I.t, I.dt)\n\n      animLoop = (timestamp) ->\n        step()\n\n        if I.running\n          window.requestAnimationFrame(animLoop)\n\n      if I.running\n        window.requestAnimationFrame(animLoop)\n\n      extend self,\n        start: ->\n          unless I.running\n            animLoop()\n            I.running = true\n\n        stop: ->\n          I.running = false\n",
+      "content": "Engine\n======\n \n    require \"cornerstone\"\n\n    module.exports = (I={}, self={}) ->\n      defaults I,\n        dt: 1/60\n        t: 0\n        paused: false\n        running: false\n\n      step = ->\n        unless I.paused\n          self.update?(I.t, I.dt)\n\n        self.render?(I.t, I.dt)\n\n      animLoop = (timestamp) ->\n        step()\n\n        if I.running\n          window.requestAnimationFrame(animLoop)\n\n      if I.running\n        window.requestAnimationFrame(animLoop)\n\n      extend self,\n        start: ->\n          unless I.running\n            animLoop()\n            I.running = true\n\n        stop: ->\n          I.running = false\n",
       "mode": "100644",
       "type": "blob"
     },
@@ -216,7 +216,7 @@
     },
     "pixie.cson": {
       "path": "pixie.cson",
-      "content": "version: \"0.1.4\"\nentryPoint: \"main\"\nremoteDependencies: [\n  \"https://code.jquery.com/jquery-1.10.1.min.js\"\n]\ndependencies:\n  cornerstone: \"distri/cornerstone:v0.2.6\"\n  spreadsheet: \"distri/gdocs-spreadsheet:v0.1.0\"\n  util: \"distri/util:v0.1.0\"\n",
+      "content": "version: \"0.1.4\"\nentryPoint: \"main\"\nremoteDependencies: [\n  \"https://code.jquery.com/jquery-1.10.1.min.js\"\n  \"https://cdnjs.cloudflare.com/ajax/libs/three.js/r69/three.min.js\"\n]\ndependencies:\n  cornerstone: \"distri/cornerstone:v0.2.6\"\n  spreadsheet: \"distri/gdocs-spreadsheet:v0.1.0\"\n  util: \"distri/util:v0.1.0\"\n",
       "mode": "100644",
       "type": "blob"
     },
@@ -254,6 +254,26 @@
       "path": "style.styl",
       "content": "*\n  box-sizing: border-box\n\nhtml\n  height: 100%\n\nbody\n  background-color: #000\n  color: #080\n  font-family: \"HelveticaNeue-Light\", \"Helvetica Neue Light\", \"Helvetica Neue\", Helvetica, Arial, \"Lucida Grande\", sans-serif\n  font-weight: 300\n  font-size: 18px\n  height: 100%\n  margin: 0\n  overflow: hidden\n  user-select: none\n",
       "mode": "100644"
+    },
+    "lib/threesome.coffee.md": {
+      "path": "lib/threesome.coffee.md",
+      "content": "Three JS Starter Kit\n====================\n\n    Engine = require \"./engine\"\n\n    initCamera = ->\n      aspectRatio = window.innerWidth / window.innerHeight\n\n      camera = new THREE.PerspectiveCamera(45, aspectRatio, 1, 2000)\n      camera.position.set 0, 100, 200\n\n      return camera\n\n    initScene = ->\n      lights = require \"./lights\"\n\n      scene = new THREE.Scene()\n      scene.add lights.ambient()\n      scene.add lights.directional()\n\n      return scene\n\n    initFloor = (scene) ->\n      Cube = require \"./cube\"\n\n      [0...10].forEach (x) ->\n        [0...10].forEach (z) ->\n          scene.add Cube(x, z)\n\n    bindWindowEvents = (camera, renderer) ->\n      resize = ->\n        renderer.setSize window.innerWidth, window.innerHeight\n  \n        camera.aspect = window.innerWidth / window.innerHeight\n        camera.updateProjectionMatrix()\n\n      $(window).resize resize\n\n      resize()\n\n    module.exports =\n      init: (data={}, update) ->\n        camera = initCamera()\n        scene = initScene()\n\n        initFloor(scene)\n\n        renderer = new THREE.WebGLRenderer()\n\n        bindWindowEvents(camera, renderer)\n        document.body.appendChild renderer.domElement\n\n        engine = Engine data.engine,\n          update: (t, dt) ->\n            # Update the scene objects!\n            update(scene, t, dt)\n\n          render: (t, dt) ->\n            camera.lookAt scene.position\n\n            renderer.render scene, camera\n\n        engine.start()\n",
+      "mode": "100644"
+    },
+    "lib/lights.coffee.md": {
+      "path": "lib/lights.coffee.md",
+      "content": "Lights\n======\n\n    exports.ambient = ->\n      new THREE.AmbientLight 0x101030\n\n    exports.directional = ->\n      directionalLight = new THREE.DirectionalLight 0xffeedd\n      directionalLight.position.set 0, 0, 10\n\n      directionalLight\n",
+      "mode": "100644"
+    },
+    "lib/cube.coffee.md": {
+      "path": "lib/cube.coffee.md",
+      "content": "Cube\n====\n\n    CUBE_SIZE = 10\n\n    geometry = new THREE.BoxGeometry(CUBE_SIZE, CUBE_SIZE, CUBE_SIZE)\n    material = new THREE.MeshBasicMaterial\n      color: 0xffffff\n      wireframe: true\n\n    module.exports = (x, z) ->\n      cube = new THREE.Object3D()\n      cube.position.set(x * CUBE_SIZE, 0, z * CUBE_SIZE)\n\n      mesh = new THREE.Mesh geometry, material\n      cube.add(mesh)\n\n      return cube\n",
+      "mode": "100644"
+    },
+    "test/threesome.coffee": {
+      "path": "test/threesome.coffee",
+      "content": "Three = require \"../lib/threesome\"\n\ndescribe \"menage a trois\", ->\n  it \"should have a scene, a camera, and a renderer\", ->\n    Three.init({}, ->)\n",
+      "mode": "100644"
     }
   },
   "distribution": {
@@ -269,7 +289,7 @@
     },
     "lib/engine": {
       "path": "lib/engine",
-      "content": "(function() {\n  module.exports = function(I, self) {\n    var animLoop, step;\n    if (I == null) {\n      I = {};\n    }\n    if (self == null) {\n      self = {};\n    }\n    defaults(I, {\n      dt: 1 / 60,\n      t: 0,\n      paused: false,\n      running: false\n    });\n    step = function() {\n      if (!I.paused) {\n        if (typeof self.update === \"function\") {\n          self.update(I.t, I.dt);\n        }\n      }\n      return typeof self.render === \"function\" ? self.render(I.t, I.dt) : void 0;\n    };\n    animLoop = function(timestamp) {\n      step();\n      if (I.running) {\n        return window.requestAnimationFrame(animLoop);\n      }\n    };\n    if (I.running) {\n      window.requestAnimationFrame(animLoop);\n    }\n    return extend(self, {\n      start: function() {\n        if (!I.running) {\n          animLoop();\n          return I.running = true;\n        }\n      },\n      stop: function() {\n        return I.running = false;\n      }\n    });\n  };\n\n}).call(this);\n",
+      "content": "(function() {\n  require(\"cornerstone\");\n\n  module.exports = function(I, self) {\n    var animLoop, step;\n    if (I == null) {\n      I = {};\n    }\n    if (self == null) {\n      self = {};\n    }\n    defaults(I, {\n      dt: 1 / 60,\n      t: 0,\n      paused: false,\n      running: false\n    });\n    step = function() {\n      if (!I.paused) {\n        if (typeof self.update === \"function\") {\n          self.update(I.t, I.dt);\n        }\n      }\n      return typeof self.render === \"function\" ? self.render(I.t, I.dt) : void 0;\n    };\n    animLoop = function(timestamp) {\n      step();\n      if (I.running) {\n        return window.requestAnimationFrame(animLoop);\n      }\n    };\n    if (I.running) {\n      window.requestAnimationFrame(animLoop);\n    }\n    return extend(self, {\n      start: function() {\n        if (!I.running) {\n          animLoop();\n          return I.running = true;\n        }\n      },\n      stop: function() {\n        return I.running = false;\n      }\n    });\n  };\n\n}).call(this);\n",
       "type": "blob"
     },
     "lib/extensions": {
@@ -289,7 +309,7 @@
     },
     "pixie": {
       "path": "pixie",
-      "content": "module.exports = {\"version\":\"0.1.4\",\"entryPoint\":\"main\",\"remoteDependencies\":[\"https://code.jquery.com/jquery-1.10.1.min.js\"],\"dependencies\":{\"cornerstone\":\"distri/cornerstone:v0.2.6\",\"spreadsheet\":\"distri/gdocs-spreadsheet:v0.1.0\",\"util\":\"distri/util:v0.1.0\"}};",
+      "content": "module.exports = {\"version\":\"0.1.4\",\"entryPoint\":\"main\",\"remoteDependencies\":[\"https://code.jquery.com/jquery-1.10.1.min.js\",\"https://cdnjs.cloudflare.com/ajax/libs/three.js/r69/three.min.js\"],\"dependencies\":{\"cornerstone\":\"distri/cornerstone:v0.2.6\",\"spreadsheet\":\"distri/gdocs-spreadsheet:v0.1.0\",\"util\":\"distri/util:v0.1.0\"}};",
       "type": "blob"
     },
     "test/character": {
@@ -321,6 +341,26 @@
       "path": "style",
       "content": "module.exports = \"* {\\n  -ms-box-sizing: border-box;\\n  -moz-box-sizing: border-box;\\n  -webkit-box-sizing: border-box;\\n  box-sizing: border-box;\\n}\\n\\nhtml {\\n  height: 100%;\\n}\\n\\nbody {\\n  background-color: #000;\\n  color: #080;\\n  font-family: \\\"HelveticaNeue-Light\\\", \\\"Helvetica Neue Light\\\", \\\"Helvetica Neue\\\", Helvetica, Arial, \\\"Lucida Grande\\\", sans-serif;\\n  font-weight: 300;\\n  font-size: 18px;\\n  height: 100%;\\n  margin: 0;\\n  overflow: hidden;\\n  -ms-user-select: none;\\n  -moz-user-select: none;\\n  -webkit-user-select: none;\\n  user-select: none;\\n}\";",
       "type": "blob"
+    },
+    "lib/threesome": {
+      "path": "lib/threesome",
+      "content": "(function() {\n  var Engine, bindWindowEvents, initCamera, initFloor, initScene;\n\n  Engine = require(\"./engine\");\n\n  initCamera = function() {\n    var aspectRatio, camera;\n    aspectRatio = window.innerWidth / window.innerHeight;\n    camera = new THREE.PerspectiveCamera(45, aspectRatio, 1, 2000);\n    camera.position.set(0, 100, 200);\n    return camera;\n  };\n\n  initScene = function() {\n    var lights, scene;\n    lights = require(\"./lights\");\n    scene = new THREE.Scene();\n    scene.add(lights.ambient());\n    scene.add(lights.directional());\n    return scene;\n  };\n\n  initFloor = function(scene) {\n    var Cube;\n    Cube = require(\"./cube\");\n    return [0, 1, 2, 3, 4, 5, 6, 7, 8, 9].forEach(function(x) {\n      return [0, 1, 2, 3, 4, 5, 6, 7, 8, 9].forEach(function(z) {\n        return scene.add(Cube(x, z));\n      });\n    });\n  };\n\n  bindWindowEvents = function(camera, renderer) {\n    var resize;\n    resize = function() {\n      renderer.setSize(window.innerWidth, window.innerHeight);\n      camera.aspect = window.innerWidth / window.innerHeight;\n      return camera.updateProjectionMatrix();\n    };\n    $(window).resize(resize);\n    return resize();\n  };\n\n  module.exports = {\n    init: function(data, update) {\n      var camera, engine, renderer, scene;\n      if (data == null) {\n        data = {};\n      }\n      camera = initCamera();\n      scene = initScene();\n      initFloor(scene);\n      renderer = new THREE.WebGLRenderer();\n      bindWindowEvents(camera, renderer);\n      document.body.appendChild(renderer.domElement);\n      engine = Engine(data.engine, {\n        update: function(t, dt) {\n          return update(scene, t, dt);\n        },\n        render: function(t, dt) {\n          camera.lookAt(scene.position);\n          return renderer.render(scene, camera);\n        }\n      });\n      return engine.start();\n    }\n  };\n\n}).call(this);\n",
+      "type": "blob"
+    },
+    "lib/lights": {
+      "path": "lib/lights",
+      "content": "(function() {\n  exports.ambient = function() {\n    return new THREE.AmbientLight(0x101030);\n  };\n\n  exports.directional = function() {\n    var directionalLight;\n    directionalLight = new THREE.DirectionalLight(0xffeedd);\n    directionalLight.position.set(0, 0, 10);\n    return directionalLight;\n  };\n\n}).call(this);\n",
+      "type": "blob"
+    },
+    "lib/cube": {
+      "path": "lib/cube",
+      "content": "(function() {\n  var CUBE_SIZE, geometry, material;\n\n  CUBE_SIZE = 10;\n\n  geometry = new THREE.BoxGeometry(CUBE_SIZE, CUBE_SIZE, CUBE_SIZE);\n\n  material = new THREE.MeshBasicMaterial({\n    color: 0xffffff,\n    wireframe: true\n  });\n\n  module.exports = function(x, z) {\n    var cube, mesh;\n    cube = new THREE.Object3D();\n    cube.position.set(x * CUBE_SIZE, 0, z * CUBE_SIZE);\n    mesh = new THREE.Mesh(geometry, material);\n    cube.add(mesh);\n    return cube;\n  };\n\n}).call(this);\n",
+      "type": "blob"
+    },
+    "test/threesome": {
+      "path": "test/threesome",
+      "content": "(function() {\n  var Three;\n\n  Three = require(\"../lib/threesome\");\n\n  describe(\"menage a trois\", function() {\n    return it(\"should have a scene, a camera, and a renderer\", function() {\n      return Three.init({}, function() {});\n    });\n  });\n\n}).call(this);\n",
+      "type": "blob"
     }
   },
   "progenitor": {
@@ -329,7 +369,8 @@
   "version": "0.1.4",
   "entryPoint": "main",
   "remoteDependencies": [
-    "https://code.jquery.com/jquery-1.10.1.min.js"
+    "https://code.jquery.com/jquery-1.10.1.min.js",
+    "https://cdnjs.cloudflare.com/ajax/libs/three.js/r69/three.min.js"
   ],
   "repository": {
     "branch": "master",
