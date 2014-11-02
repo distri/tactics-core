@@ -26,13 +26,13 @@ window["distri/tactics-core:master"]({
     },
     "lib/engine.coffee.md": {
       "path": "lib/engine.coffee.md",
-      "content": "Engine\n======\n \n    require \"cornerstone\"\n\n    module.exports = (I={}, self={}) ->\n      defaults I,\n        dt: 1/60\n        t: 0\n        paused: false\n        running: false\n\n      step = ->\n        unless I.paused\n          self.update?(I.t, I.dt)\n\n        self.render?(I.t, I.dt)\n\n      animLoop = (timestamp) ->\n        step()\n\n        if I.running\n          window.requestAnimationFrame(animLoop)\n\n      if I.running\n        window.requestAnimationFrame(animLoop)\n\n      extend self,\n        start: ->\n          unless I.running\n            animLoop()\n            I.running = true\n\n        stop: ->\n          I.running = false\n",
+      "content": "Engine\n======\n \n    require \"cornerstone\"\n\n    module.exports = (I={}, self={}) ->\n      defaults I,\n        dt: 1/60\n        t: 0\n        paused: false\n        running: false\n\n      step = ->\n        unless I.paused\n          self.update?(I.t, I.dt)\n\n        self.render?(I.t, I.dt)\n\n      animLoop = (timestamp) ->\n        step()\n\n        if I.running\n          window.requestAnimationFrame(animLoop)\n\n      if I.running\n        window.requestAnimationFrame(animLoop)\n\n      extend self,\n        start: ->\n          unless I.running\n            I.running = true\n            animLoop()\n\n        stop: ->\n          I.running = false\n",
       "mode": "100644",
       "type": "blob"
     },
     "lib/extensions.coffee.md": {
       "path": "lib/extensions.coffee.md",
-      "content": "Extensions\n==========\n\n    require \"cornerstone\"\n\nTemporary home for extending cornerstone builtins.\n\n    extend global,\n\nAdding an attrData method to the Model module.\n\n      Model: do (oldModel=Model) ->\n        (I, self) ->\n          self = oldModel(I, self)\n\n          extend self,\n\n`attrData` models an attribute as a data object. For example if our object has\na position attribute with x and y values we can do\n\n>     self.attrData(\"position\", Point)\n\nto promote the raw data into a Point data model available through a public\nmethod named position.\n\n            attrData: (name, DataModel) ->\n              I[name] = DataModel(I[name])\n\n              self[name] = (newValue) ->\n                if arguments.length > 0\n                  I[name] = DataModel(newValue)\n                else\n                  I[name]\n\n          return self\n",
+      "content": "Extensions\n==========\n\n    require \"cornerstone\"\n\nTemporary home for extending cornerstone builtins.\n\n    extend global,\n\nAdding a global method to iterate object properties.\n\n      keyValues: (object, fn) ->\n        Object.keys(object).forEach (key) ->\n          value = object[key]\n\n          fn(key, value, object)\n\n        return object\n\nAdding an attrData method to the Model module.\n\n      Model: do (oldModel=Model) ->\n        (I, self) ->\n          self = oldModel(I, self)\n\n          extend self,\n\n`attrData` models an attribute as a data object. For example if our object has\na position attribute with x and y values we can do\n\n>     self.attrData(\"position\", Point)\n\nto promote the raw data into a Point data model available through a public\nmethod named position.\n\n            attrData: (name, DataModel) ->\n              I[name] = DataModel(I[name])\n\n              self[name] = (newValue) ->\n                if arguments.length > 0\n                  I[name] = DataModel(newValue)\n                else\n                  I[name]\n\n          return self\n",
       "mode": "100644",
       "type": "blob"
     },
@@ -50,7 +50,7 @@ window["distri/tactics-core:master"]({
     },
     "pixie.cson": {
       "path": "pixie.cson",
-      "content": "version: \"0.1.7\"\nentryPoint: \"main\"\nremoteDependencies: [\n  \"https://code.jquery.com/jquery-1.10.1.min.js\"\n  \"https://cdnjs.cloudflare.com/ajax/libs/three.js/r69/three.min.js\"\n]\ndependencies:\n  cornerstone: \"distri/cornerstone:v0.2.6\"\n  spreadsheet: \"distri/gdocs-spreadsheet:v0.1.0\"\n  util: \"distri/util:v0.1.0\"\n",
+      "content": "version: \"0.1.8\"\nentryPoint: \"main\"\nremoteDependencies: [\n  \"https://code.jquery.com/jquery-1.10.1.min.js\"\n  \"https://cdnjs.cloudflare.com/ajax/libs/three.js/r69/three.min.js\"\n]\ndependencies:\n  cornerstone: \"distri/cornerstone:v0.2.6\"\n  spreadsheet: \"distri/gdocs-spreadsheet:v0.1.0\"\n  util: \"distri/util:v0.1.0\"\n",
       "mode": "100644",
       "type": "blob"
     },
@@ -62,7 +62,7 @@ window["distri/tactics-core:master"]({
     },
     "test/engine.coffee": {
       "path": "test/engine.coffee",
-      "content": "Engine = require \"../lib/engine\"\n\ndescribe \"engine\", ->\n  it \"should start and stop\", (done) ->\n    engine = Engine({},\n      update: ->\n        engine.stop()\n        done()\n    )\n\n    engine.start()\n",
+      "content": "Engine = require \"../lib/engine\"\n\ndescribe \"engine\", ->\n  it \"should start and stop\", (done) ->\n    engine = Engine({},\n      update: ->\n        engine.stop()\n        done()\n    )\n\n    engine.start()\n\n  it \"should update about 60 times a second\", (done) ->\n    c = 0\n\n    engine = Engine {},\n      update: ->\n        c += 1\n\n    engine.start()\n\n    setTimeout ->\n      console.log c\n      assert c > 50\n      assert c < 70\n      engine.stop()\n      done()\n    , 1000\n",
       "mode": "100644",
       "type": "blob"
     },
@@ -103,6 +103,11 @@ window["distri/tactics-core:master"]({
       "path": "lib/cube.coffee.md",
       "content": "Cube\n====\n\n    CUBE_SIZE = 10\n\n    geometry = new THREE.BoxGeometry(CUBE_SIZE, CUBE_SIZE, CUBE_SIZE)\n    material = new THREE.MeshBasicMaterial\n      color: 0xffffff\n      wireframe: true\n\n    module.exports = (x, z) ->\n      cube = new THREE.Object3D()\n      cube.position.set(x * CUBE_SIZE, 0, z * CUBE_SIZE)\n\n      mesh = new THREE.Mesh geometry, material\n      cube.add(mesh)\n\n      return cube\n",
       "mode": "100644"
+    },
+    "test/key_values.coffee": {
+      "path": "test/key_values.coffee",
+      "content": "describe \"keyValues\", ->\n  it \"should iterate keys and values of an object\", (done) ->\n    o = \n      test: \"value\"\n\n    keyValues o, (key, value) ->\n      assert.equal key, \"test\"\n      assert.equal value, \"value\"\n\n      done()\n",
+      "mode": "100644"
     }
   },
   "distribution": {
@@ -118,12 +123,12 @@ window["distri/tactics-core:master"]({
     },
     "lib/engine": {
       "path": "lib/engine",
-      "content": "(function() {\n  require(\"cornerstone\");\n\n  module.exports = function(I, self) {\n    var animLoop, step;\n    if (I == null) {\n      I = {};\n    }\n    if (self == null) {\n      self = {};\n    }\n    defaults(I, {\n      dt: 1 / 60,\n      t: 0,\n      paused: false,\n      running: false\n    });\n    step = function() {\n      if (!I.paused) {\n        if (typeof self.update === \"function\") {\n          self.update(I.t, I.dt);\n        }\n      }\n      return typeof self.render === \"function\" ? self.render(I.t, I.dt) : void 0;\n    };\n    animLoop = function(timestamp) {\n      step();\n      if (I.running) {\n        return window.requestAnimationFrame(animLoop);\n      }\n    };\n    if (I.running) {\n      window.requestAnimationFrame(animLoop);\n    }\n    return extend(self, {\n      start: function() {\n        if (!I.running) {\n          animLoop();\n          return I.running = true;\n        }\n      },\n      stop: function() {\n        return I.running = false;\n      }\n    });\n  };\n\n}).call(this);\n",
+      "content": "(function() {\n  require(\"cornerstone\");\n\n  module.exports = function(I, self) {\n    var animLoop, step;\n    if (I == null) {\n      I = {};\n    }\n    if (self == null) {\n      self = {};\n    }\n    defaults(I, {\n      dt: 1 / 60,\n      t: 0,\n      paused: false,\n      running: false\n    });\n    step = function() {\n      if (!I.paused) {\n        if (typeof self.update === \"function\") {\n          self.update(I.t, I.dt);\n        }\n      }\n      return typeof self.render === \"function\" ? self.render(I.t, I.dt) : void 0;\n    };\n    animLoop = function(timestamp) {\n      step();\n      if (I.running) {\n        return window.requestAnimationFrame(animLoop);\n      }\n    };\n    if (I.running) {\n      window.requestAnimationFrame(animLoop);\n    }\n    return extend(self, {\n      start: function() {\n        if (!I.running) {\n          I.running = true;\n          return animLoop();\n        }\n      },\n      stop: function() {\n        return I.running = false;\n      }\n    });\n  };\n\n}).call(this);\n",
       "type": "blob"
     },
     "lib/extensions": {
       "path": "lib/extensions",
-      "content": "(function() {\n  require(\"cornerstone\");\n\n  extend(global, {\n    Model: (function(oldModel) {\n      return function(I, self) {\n        self = oldModel(I, self);\n        extend(self, {\n          attrData: function(name, DataModel) {\n            I[name] = DataModel(I[name]);\n            return self[name] = function(newValue) {\n              if (arguments.length > 0) {\n                return I[name] = DataModel(newValue);\n              } else {\n                return I[name];\n              }\n            };\n          }\n        });\n        return self;\n      };\n    })(Model)\n  });\n\n}).call(this);\n",
+      "content": "(function() {\n  require(\"cornerstone\");\n\n  extend(global, {\n    keyValues: function(object, fn) {\n      Object.keys(object).forEach(function(key) {\n        var value;\n        value = object[key];\n        return fn(key, value, object);\n      });\n      return object;\n    },\n    Model: (function(oldModel) {\n      return function(I, self) {\n        self = oldModel(I, self);\n        extend(self, {\n          attrData: function(name, DataModel) {\n            I[name] = DataModel(I[name]);\n            return self[name] = function(newValue) {\n              if (arguments.length > 0) {\n                return I[name] = DataModel(newValue);\n              } else {\n                return I[name];\n              }\n            };\n          }\n        });\n        return self;\n      };\n    })(Model)\n  });\n\n}).call(this);\n",
       "type": "blob"
     },
     "main": {
@@ -138,7 +143,7 @@ window["distri/tactics-core:master"]({
     },
     "pixie": {
       "path": "pixie",
-      "content": "module.exports = {\"version\":\"0.1.7\",\"entryPoint\":\"main\",\"remoteDependencies\":[\"https://code.jquery.com/jquery-1.10.1.min.js\",\"https://cdnjs.cloudflare.com/ajax/libs/three.js/r69/three.min.js\"],\"dependencies\":{\"cornerstone\":\"distri/cornerstone:v0.2.6\",\"spreadsheet\":\"distri/gdocs-spreadsheet:v0.1.0\",\"util\":\"distri/util:v0.1.0\"}};",
+      "content": "module.exports = {\"version\":\"0.1.8\",\"entryPoint\":\"main\",\"remoteDependencies\":[\"https://code.jquery.com/jquery-1.10.1.min.js\",\"https://cdnjs.cloudflare.com/ajax/libs/three.js/r69/three.min.js\"],\"dependencies\":{\"cornerstone\":\"distri/cornerstone:v0.2.6\",\"spreadsheet\":\"distri/gdocs-spreadsheet:v0.1.0\",\"util\":\"distri/util:v0.1.0\"}};",
       "type": "blob"
     },
     "test/character": {
@@ -148,7 +153,7 @@ window["distri/tactics-core:master"]({
     },
     "test/engine": {
       "path": "test/engine",
-      "content": "(function() {\n  var Engine;\n\n  Engine = require(\"../lib/engine\");\n\n  describe(\"engine\", function() {\n    return it(\"should start and stop\", function(done) {\n      var engine;\n      engine = Engine({}, {\n        update: function() {\n          engine.stop();\n          return done();\n        }\n      });\n      return engine.start();\n    });\n  });\n\n}).call(this);\n",
+      "content": "(function() {\n  var Engine;\n\n  Engine = require(\"../lib/engine\");\n\n  describe(\"engine\", function() {\n    it(\"should start and stop\", function(done) {\n      var engine;\n      engine = Engine({}, {\n        update: function() {\n          engine.stop();\n          return done();\n        }\n      });\n      return engine.start();\n    });\n    return it(\"should update about 60 times a second\", function(done) {\n      var c, engine;\n      c = 0;\n      engine = Engine({}, {\n        update: function() {\n          return c += 1;\n        }\n      });\n      engine.start();\n      return setTimeout(function() {\n        console.log(c);\n        assert(c > 50);\n        assert(c < 70);\n        engine.stop();\n        return done();\n      }, 1000);\n    });\n  });\n\n}).call(this);\n",
       "type": "blob"
     },
     "test/loading": {
@@ -185,12 +190,17 @@ window["distri/tactics-core:master"]({
       "path": "lib/cube",
       "content": "(function() {\n  var CUBE_SIZE, geometry, material;\n\n  CUBE_SIZE = 10;\n\n  geometry = new THREE.BoxGeometry(CUBE_SIZE, CUBE_SIZE, CUBE_SIZE);\n\n  material = new THREE.MeshBasicMaterial({\n    color: 0xffffff,\n    wireframe: true\n  });\n\n  module.exports = function(x, z) {\n    var cube, mesh;\n    cube = new THREE.Object3D();\n    cube.position.set(x * CUBE_SIZE, 0, z * CUBE_SIZE);\n    mesh = new THREE.Mesh(geometry, material);\n    cube.add(mesh);\n    return cube;\n  };\n\n}).call(this);\n",
       "type": "blob"
+    },
+    "test/key_values": {
+      "path": "test/key_values",
+      "content": "(function() {\n  describe(\"keyValues\", function() {\n    return it(\"should iterate keys and values of an object\", function(done) {\n      var o;\n      o = {\n        test: \"value\"\n      };\n      return keyValues(o, function(key, value) {\n        assert.equal(key, \"test\");\n        assert.equal(value, \"value\");\n        return done();\n      });\n    });\n  });\n\n}).call(this);\n",
+      "type": "blob"
     }
   },
   "progenitor": {
     "url": "http://www.danielx.net/editor/"
   },
-  "version": "0.1.7",
+  "version": "0.1.8",
   "entryPoint": "main",
   "remoteDependencies": [
     "https://code.jquery.com/jquery-1.10.1.min.js",

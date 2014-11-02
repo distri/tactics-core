@@ -61,8 +61,8 @@ module.<span class="function"><span class="title">exports</span></span> = (I={},
   extend self,
     start: -&gt;
       <span class="keyword">unless</span> I.running
-        animLoop()
         I.running = <span class="literal">true</span>
+        animLoop()
 
     stop: -&gt;
       I.running = <span class="literal">false</span></code></pre>

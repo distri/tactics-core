@@ -57,6 +57,25 @@
               <div class="pilwrap">
                 <a class="pilcrow" href="#section-4">&#182;</a>
               </div>
+              <p>Adding a global method to iterate object properties.</p>
+
+            </div>
+            <div class="content"><pre><code class="lang-coffeescript">  keyValues: (object, fn) -&gt;
+    Object.keys(object).forEach (key) -&gt;
+      value = object[key]
+
+      fn(key, value, object)
+
+    <span class="keyword">return</span> object</code></pre>
+</div>
+        </li>
+        
+        
+        <li id="section-5">
+            <div class="annotation">
+              <div class="pilwrap">
+                <a class="pilcrow" href="#section-5">&#182;</a>
+              </div>
               <p>Adding an attrData method to the Model module.</p>
 
             </div>
@@ -69,10 +88,10 @@
         </li>
         
         
-        <li id="section-5">
+        <li id="section-6">
             <div class="annotation">
               <div class="pilwrap">
-                <a class="pilcrow" href="#section-5">&#182;</a>
+                <a class="pilcrow" href="#section-6">&#182;</a>
               </div>
               <p><code>attrData</code> models an attribute as a data object. For example if our object has
 a position attribute with x and y values we can do</p>
