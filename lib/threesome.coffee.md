@@ -2,6 +2,7 @@ Three JS Starter Kit
 ====================
 
     Engine = require "./engine"
+    Stats = require "stats"
 
     initCamera = ->
       aspectRatio = window.innerWidth / window.innerHeight
@@ -38,8 +39,30 @@ Three JS Starter Kit
 
       resize()
 
+    initStats = ->
+      updateStats = new Stats
+      updateStats.setMode(1)
+      renderStats = new Stats
+      renderStats.setMode(1)
+
+      updateStats.domElement.style.position = 'absolute';
+      updateStats.domElement.style.left = '0px';
+      updateStats.domElement.style.top = '0px';
+
+      document.body.appendChild( updateStats.domElement );
+
+      renderStats.domElement.style.position = 'absolute';
+      renderStats.domElement.style.right = '0px';
+      renderStats.domElement.style.top = '0px';
+
+      document.body.appendChild( renderStats.domElement );
+
+      return [updateStats, renderStats]
+
     module.exports =
       init: (data={}, update) ->
+        [updateStats, renderStats] = initStats()
+    
         camera = initCamera()
         scene = initScene()
 
@@ -53,11 +76,15 @@ Three JS Starter Kit
         engine = Engine data.engine,
           update: (t, dt) ->
             # Update the scene objects!
+            updateStats.begin()
             update(scene, t, dt)
+            updateStats.end()
 
           render: (t, dt) ->
             camera.lookAt scene.position
 
+            renderStats.begin()
             renderer.render scene, camera
+            renderStats.end()
 
         engine.start()

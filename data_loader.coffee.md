@@ -22,6 +22,7 @@ Data Loader
             name: row.name.trim()
             gender: row.gender.trim()
             culture: row.culture.trim()
+      get: get
 
     characterDataTransform = (data) ->
       extend data,
