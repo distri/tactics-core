@@ -18,15 +18,39 @@ window["distri/tactics-core:master"]({
       "mode": "100644",
       "type": "blob"
     },
+    "data_loader.coffee.md": {
+      "path": "data_loader.coffee.md",
+      "content": "Data Loader\n===========\n\n    Spreadsheet = require \"spreadsheet\"\n    sheetData = null\n\n    loader = null\n    get = ->\n      return loader if loader\n\n      loader = Spreadsheet.load(\"0ArtCBkZR37MmdFJqbjloVEp1OFZLWDJ6M29OcXQ1WkE\")\n\n      return loader\n\n    module.exports =\n      characters: ->\n        get().then (data) ->\n          characterFromRemote(data.Characters)\n      names: ->\n        get().then (data) ->\n          data.Names.map (row) ->\n            name: row.name.trim()\n            gender: row.gender.trim()\n            culture: row.culture.trim()\n\n    characterDataTransform = (data) ->\n      extend data,\n        healthMax: data.healthmax\n        abilities: data.abilities.split(',')\n        passives: (data.passives ? \"\").split(',')\n        spriteName: data.sprite\n\n      delete data.healthmax\n      delete data.sprite\n\n      return data\n\n    characterFromRemote = (data) ->\n      console.log data\n      results = {}\n      data.forEach (datum) ->\n        results[datum.name] = characterDataTransform(datum)\n\n      return results\n",
+      "mode": "100644",
+      "type": "blob"
+    },
+    "lib/engine.coffee.md": {
+      "path": "lib/engine.coffee.md",
+      "content": "Engine\n======\n\n    module.exports = (I={}, self={}) ->\n      defaults I,\n        dt: 1/60\n        t: 0\n        paused: false\n        running: false\n\n      step = ->\n        unless I.paused\n          self.update?(I.t, I.dt)\n\n        self.render?(I.t, I.dt)\n\n      animLoop = (timestamp) ->\n        step()\n\n        if I.running\n          window.requestAnimationFrame(animLoop)\n\n      if I.running\n        window.requestAnimationFrame(animLoop)\n\n      extend self,\n        start: ->\n          unless I.running\n            animLoop()\n            I.running = true\n\n        stop: ->\n          I.running = false\n",
+      "mode": "100644",
+      "type": "blob"
+    },
     "lib/extensions.coffee.md": {
       "path": "lib/extensions.coffee.md",
       "content": "Extensions\n==========\n\n    require \"cornerstone\"\n\nTemporary home for extending cornerstone builtins.\n\n    extend global,\n\nAdding an attrData method to the Model module.\n\n      Model: do (oldModel=Model) ->\n        (I, self) ->\n          self = oldModel(I, self)\n\n          extend self,\n\n`attrData` models an attribute as a data object. For example if our object has\na position attribute with x and y values we can do\n\n>     self.attrData(\"position\", Point)\n\nto promote the raw data into a Point data model available through a public\nmethod named position.\n\n            attrData: (name, DataModel) ->\n              I[name] = DataModel(I[name])\n\n              self[name] = (newValue) ->\n                if arguments.length > 0\n                  I[name] = DataModel(newValue)\n                else\n                  I[name]\n\n          return self\n",
       "mode": "100644",
       "type": "blob"
     },
+    "main.coffee.md": {
+      "path": "main.coffee.md",
+      "content": "Tactics Core\n============\n\nData structures that make up the core of Tactis Game.\n\n    {applyStylesheet} = require \"util\"\n\n    module.exports =\n      Character: require \"./character\"\n      Name: require \"./names\"\n      Engine: require \"./lib/engine\"\n      init: ->\n        applyStylesheet require(\"./style\")\n",
+      "mode": "100644",
+      "type": "blob"
+    },
+    "names.coffee.md": {
+      "path": "names.coffee.md",
+      "content": "Names\n=====\n\n    ANY = \"*\"\n\n    module.exports = (data) ->\n      random: (options={}) ->\n        predicate = (row) ->\n          (!options.culture or row.culture is options.culture) and\n          (!options.gender or row.gender is ANY or row.gender is options.gender)\n        data.filter(predicate)\n        .rand()\n        .name\n",
+      "mode": "100644",
+      "type": "blob"
+    },
     "pixie.cson": {
       "path": "pixie.cson",
-      "content": "version: \"0.1.4\"\nentryPoint: \"main\"\nremoteDependencies: [\n  \"https://code.jquery.com/jquery-1.10.1.min.js\"\n]\ndependencies:\n  cornerstone: \"distri/cornerstone:v0.2.6\"\n  spreadsheet: \"distri/gdocs-spreadsheet:v0.1.0\"\n",
+      "content": "version: \"0.1.4\"\nentryPoint: \"main\"\nremoteDependencies: [\n  \"https://code.jquery.com/jquery-1.10.1.min.js\"\n]\ndependencies:\n  cornerstone: \"distri/cornerstone:v0.2.6\"\n  spreadsheet: \"distri/gdocs-spreadsheet:v0.1.0\"\n  util: \"distri/util:v0.1.0\"\n",
       "mode": "100644",
       "type": "blob"
     },
@@ -36,44 +60,33 @@ window["distri/tactics-core:master"]({
       "mode": "100644",
       "type": "blob"
     },
+    "test/engine.coffee": {
+      "path": "test/engine.coffee",
+      "content": "Engine = require \"../lib/engine\"\n\ndescribe \"engine\", ->\n  it \"should start and stop\", (done) ->\n    engine = Engine({},\n      update: ->\n        engine.stop()\n        done()\n    )\n\n    engine.start()\n",
+      "mode": "100644",
+      "type": "blob"
+    },
     "test/loading.coffee": {
       "path": "test/loading.coffee",
       "content": "mocha.globals ['jQuery*']\n\nDataLoader = require \"../data_loader\"\n\ndescribe \"Character loading\", ->\n  it \"should load data from remote spreadsheets\", (done) ->\n    DataLoader.characters().then (characters) ->\n      console.log characters\n      done()\n    .done()\n\ndescribe \"Name loading\", ->\n  it \"should load name data from remote spreadsheets\", (done) ->\n    DataLoader.names().then (names) ->\n      console.log names\n      done()\n    .done()\n",
-      "mode": "100644"
-    },
-    "main.coffee.md": {
-      "path": "main.coffee.md",
-      "content": "Tactics Core\n============\n\nData structures that make up the core of Tactis Game.\n\n    module.exports =\n      Character: require \"./character\"\n      Name: require \"./names\"\n      Engine: require \"./lib/engine\"\n",
-      "mode": "100644"
+      "mode": "100644",
+      "type": "blob"
     },
     "test/main.coffee": {
       "path": "test/main.coffee",
-      "content": "Main = require \"../main\"\n\ndescribe \"main\", ->\n  it \"sholud expose Character\", ->\n    assert Main.Character\n",
-      "mode": "100644"
-    },
-    "data_loader.coffee.md": {
-      "path": "data_loader.coffee.md",
-      "content": "Data Loader\n===========\n\n    Spreadsheet = require \"spreadsheet\"\n    sheetData = null\n\n    loader = null\n    get = ->\n      return loader if loader\n\n      loader = Spreadsheet.load(\"0ArtCBkZR37MmdFJqbjloVEp1OFZLWDJ6M29OcXQ1WkE\")\n\n      return loader\n\n    module.exports =\n      characters: ->\n        get().then (data) ->\n          characterFromRemote(data.Characters)\n      names: ->\n        get().then (data) ->\n          data.Names.map (row) ->\n            name: row.name.trim()\n            gender: row.gender.trim()\n            culture: row.culture.trim()\n\n    characterDataTransform = (data) ->\n      extend data,\n        healthMax: data.healthmax\n        abilities: data.abilities.split(',')\n        passives: (data.passives ? \"\").split(',')\n        spriteName: data.sprite\n\n      delete data.healthmax\n      delete data.sprite\n\n      return data\n\n    characterFromRemote = (data) ->\n      console.log data\n      results = {}\n      data.forEach (datum) ->\n        results[datum.name] = characterDataTransform(datum)\n\n      return results\n",
-      "mode": "100644"
-    },
-    "names.coffee.md": {
-      "path": "names.coffee.md",
-      "content": "Names\n=====\n\n    ANY = \"*\"\n\n    module.exports = (data) ->\n      random: (options={}) ->\n        predicate = (row) ->\n          (!options.culture or row.culture is options.culture) and\n          (!options.gender or row.gender is ANY or row.gender is options.gender)\n        data.filter(predicate)\n        .rand()\n        .name\n",
-      "mode": "100644"
+      "content": "Main = require \"../main\"\n\ndescribe \"main\", ->\n  it \"should expose Character\", ->\n    assert Main.Character\n\n  it \"should init\", ->\n    assert Main.init()\n",
+      "mode": "100644",
+      "type": "blob"
     },
     "test/names.coffee": {
       "path": "test/names.coffee",
       "content": "Names = require \"../names\"\nDataLoader = require \"../data_loader\"\n\nDataLoader.names().then (data) ->\n  NamePicker = Names(data)\n\n  describe \"Names\", ->\n    it \"should pick at random\", ->\n      name = NamePicker.random()\n\n      console.log name\n      assert name\n\n    it \"should pick a scoped name\", ->\n      name = NamePicker.random\n        culture: \"Monster\"\n\n      console.log name\n      assert name\n\n    it \"should pick a name scoped by culture and gender\", ->\n      name = NamePicker.random\n        culture: \"Humanoid\"\n        gender: \"F\"\n\n      console.log name\n      assert name\n",
-      "mode": "100644"
+      "mode": "100644",
+      "type": "blob"
     },
-    "lib/engine.coffee.md": {
-      "path": "lib/engine.coffee.md",
-      "content": "Engine\n======\n\n    module.exports = (I={}, self={}) ->\n      defaults I,\n        dt: 1/60\n        t: 0\n        paused: false\n        running: false\n\n      step = ->\n        unless I.paused\n          self.update?(I.t, I.dt)\n\n        self.render?(I.t, I.dt)\n\n      animLoop = (timestamp) ->\n        step()\n\n        if I.running\n          window.requestAnimationFrame(animLoop)\n\n      if I.running\n        window.requestAnimationFrame(animLoop)\n\n      extend self,\n        start: ->\n          unless I.running\n            animLoop()\n            I.running = true\n\n        stop: ->\n          I.running = false\n",
-      "mode": "100644"
-    },
-    "test/engine.coffee": {
-      "path": "test/engine.coffee",
-      "content": "Engine = require \"../lib/engine\"\n\ndescribe \"engine\", ->\n  it \"should start and stop\", (done) ->\n    engine = Engine({},\n      update: ->\n        engine.stop()\n        done()\n    )\n\n    engine.start()\n",
+    "style.styl": {
+      "path": "style.styl",
+      "content": "*\n  box-sizing: border-box\n\nhtml\n  height: 100%\n\nbody\n  background-color: #000\n  color: #080\n  font-family: \"HelveticaNeue-Light\", \"Helvetica Neue Light\", \"Helvetica Neue\", Helvetica, Arial, \"Lucida Grande\", sans-serif\n  font-weight: 300\n  font-size: 18px\n  height: 100%\n  margin: 0\n  overflow: hidden\n  user-select: none\n",
       "mode": "100644"
     }
   },
@@ -83,49 +96,9 @@ window["distri/tactics-core:master"]({
       "content": "(function() {\n  var Spreadsheet, max, min, sqrt,\n    __slice = [].slice;\n\n  require(\"./lib/extensions\");\n\n  require(\"cornerstone\");\n\n  Spreadsheet = require(\"spreadsheet\");\n\n  sqrt = Math.sqrt, min = Math.min, max = Math.max;\n\n  module.exports = function(I, self) {\n    var effectModifiable, ensureNumber;\n    if (I == null) {\n      I = {};\n    }\n    if (self == null) {\n      self = Core(I);\n    }\n    defaults(I, {\n      abilities: [\"Move\", \"Melee\"],\n      actions: 2,\n      alive: true,\n      cooldowns: {},\n      effects: [],\n      health: 3,\n      healthMax: 3,\n      movement: 4,\n      name: \"Duder\",\n      passives: [],\n      physicalAwareness: sqrt(2),\n      position: {\n        x: 0,\n        y: 0\n      },\n      sight: 7,\n      strength: 1,\n      stun: 0\n    });\n    self.include(Model);\n    self.attrAccessor(\"abilities\", \"alive\", \"cooldowns\", \"debugPositions\", \"movement\", \"name\", \"physicalAwareness\");\n    ensureNumber = function(value) {\n      var result;\n      result = parseFloat(value);\n      if (isNaN(result)) {\n        throw \"Invalid number\";\n      }\n      return result;\n    };\n    [\"actions\", \"health\", \"healthMax\", \"movement\", \"sight\", \"strength\"].forEach(function(name) {\n      return self.attrData(name, ensureNumber);\n    });\n    self.attrData(\"position\", Point);\n    effectModifiable = function() {\n      var names;\n      names = 1 <= arguments.length ? __slice.call(arguments, 0) : [];\n      return names.forEach(function(name) {\n        var method;\n        method = self[name];\n        return self[name] = function() {\n          var args;\n          args = 1 <= arguments.length ? __slice.call(arguments, 0) : [];\n          if (args.length > 0) {\n            return method.apply(null, args);\n          } else {\n            return method() + self.mods(name);\n          }\n        };\n      });\n    };\n    effectModifiable(\"sight\", \"strength\");\n    self.extend({\n      damage: function(amount, type) {\n        var damageTotal;\n        damageTotal = self.modifiedDamage(amount, type);\n        return I.health -= damageTotal;\n      },\n      dead: function() {\n        return !self.alive();\n      },\n      heal: function(amount) {\n        return I.health += amount;\n      },\n      cooldown: function(ability) {\n        return I.cooldowns[ability.name()] || 0;\n      },\n      setCooldown: function(ability) {\n        return I.cooldowns[ability.name()] = ability.cooldown();\n      },\n      addEffect: function(effect) {\n        return I.effects.push(effect);\n      },\n      mods: function(attribute) {\n        return I.effects.reduce(function(total, effect) {\n          if (effect.attribute === attribute) {\n            return total + effect.amount;\n          } else {\n            return total;\n          }\n        }, 0);\n      },\n      modifiedDamage: function(amount, type) {\n        if (type == null) {\n          type = \"Physical\";\n        }\n        if (self.immune(type)) {\n          return 0;\n        }\n        amount = (amount * (1 - self.resistance(type))).clamp(0, amount);\n        return amount;\n      },\n      resistance: function(type) {\n        return I.effects.filter(function(effect) {\n          return effect.type === type && effect.resistance;\n        }).reduce(function(total, effect) {\n          return total + effect.resistance;\n        }, 0);\n      },\n      immune: function(type) {\n        return self.immunities().include(type);\n      },\n      immunities: function(type) {\n        return self.passives().map(function(passive) {\n          return passive.immune;\n        }).compact();\n      },\n      stateBasedActions: function() {\n        if (!I.alive) {\n          return;\n        }\n        I.effects = I.effects.filter(function(effect) {\n          return effect.duration > 0;\n        });\n        if (I.health > I.healthMax) {\n          I.health = I.healthMax;\n        }\n        if (I.health <= 0) {\n          I.alive = false;\n          I.actions = 0;\n        }\n        Object.keys(I.cooldowns).forEach(function(name) {\n          if (I.cooldowns[name] < 0) {\n            return I.cooldowns[name] = 0;\n          }\n        });\n        if (I.stun < 0) {\n          I.stun = 0;\n        }\n      },\n      stun: function(stun) {\n        I.stun = Math.max(I.stun, stun);\n        return I.actions = 0;\n      },\n      stunned: function() {\n        return I.stun > 0;\n      },\n      aware: function() {\n        return self.alive() && !self.stunned();\n      },\n      enterEffects: function() {\n        return self.passives().map(function(passive) {\n          return passive.enter;\n        }).compact();\n      },\n      visionEffects: function() {\n        return self.passives().map(function(passive) {\n          return passive.visionEffect;\n        }).compact();\n      },\n      physicalAwareness: function() {\n        if (!self.aware()) {\n          return 0;\n        } else {\n          return I.physicalAwareness + self.mods(name);\n        }\n      },\n      targettingAbility: Observable(),\n      resetTargetting: function() {\n        return self.targettingAbility(null);\n      },\n      ready: function() {\n        if (I.stun > 0) {\n          I.stun -= 1;\n        }\n        Object.keys(I.cooldowns).forEach(function(name) {\n          return I.cooldowns[name] -= 1;\n        });\n        I.effects.forEach(function(effect) {\n          if (typeof effect.update === \"function\") {\n            effect.update(self);\n          }\n          return effect.duration -= 1;\n        });\n        if (I.stun === 0) {\n          return I.actions = 2;\n        } else {\n          return I.actions = 0;\n        }\n      },\n      passives: function() {\n        return I.passives.map(function(name) {\n          var passive;\n          if (passive = Passive.Passives[name]) {\n            return passive;\n          } else {\n            return console.warn(\"Undefined Passive: '\" + name + \"'\");\n          }\n        }).compact();\n      },\n      visionType: function() {\n        var type;\n        type = self.passives().reduce(function(memo, passive) {\n          return memo || passive.visionType;\n        }, void 0);\n        return type || \"sight\";\n      }\n    });\n    return self;\n  };\n\n}).call(this);\n",
       "type": "blob"
     },
-    "lib/extensions": {
-      "path": "lib/extensions",
-      "content": "(function() {\n  require(\"cornerstone\");\n\n  extend(global, {\n    Model: (function(oldModel) {\n      return function(I, self) {\n        self = oldModel(I, self);\n        extend(self, {\n          attrData: function(name, DataModel) {\n            I[name] = DataModel(I[name]);\n            return self[name] = function(newValue) {\n              if (arguments.length > 0) {\n                return I[name] = DataModel(newValue);\n              } else {\n                return I[name];\n              }\n            };\n          }\n        });\n        return self;\n      };\n    })(Model)\n  });\n\n}).call(this);\n",
-      "type": "blob"
-    },
-    "pixie": {
-      "path": "pixie",
-      "content": "module.exports = {\"version\":\"0.1.4\",\"entryPoint\":\"main\",\"remoteDependencies\":[\"https://code.jquery.com/jquery-1.10.1.min.js\"],\"dependencies\":{\"cornerstone\":\"distri/cornerstone:v0.2.6\",\"spreadsheet\":\"distri/gdocs-spreadsheet:v0.1.0\"}};",
-      "type": "blob"
-    },
-    "test/character": {
-      "path": "test/character",
-      "content": "(function() {\n  var Character;\n\n  Character = require(\"../character\");\n\n  describe(\"Character\", function() {\n    var character;\n    character = Character();\n    it(\"should have health\", function() {\n      return assert(character.health());\n    });\n    it(\"should have actions\", function() {\n      return assert(character.actions());\n    });\n    it(\"should serialize position to JSON\", function() {\n      character.position(Point(5, 2));\n      assert(character.I.position);\n      assert.equal(character.I.position.x, 5);\n      return assert.equal(character.toJSON().position.x, 5);\n    });\n    it(\"should process state based actions\", function() {\n      return character.stateBasedActions();\n    });\n    it(\"should be able to have stats modified by effects\", function() {\n      assert.equal(character.mods(\"strength\"), 0);\n      character.addEffect({\n        attribute: \"strength\",\n        amount: -3\n      });\n      return assert.equal(character.mods(\"strength\"), -3);\n    });\n    it(\"effects should be able to provide damage immunity\", function() {\n      character.addEffect({\n        resistance: 1,\n        type: \"Fire\"\n      });\n      return assert.equal(character.modifiedDamage(999, \"Fire\"), 0);\n    });\n    return it(\"should die when taking a boatload of damage\", function() {\n      var boatload;\n      boatload = 999;\n      character.damage(boatload);\n      character.stateBasedActions();\n      return assert(character.dead());\n    });\n  });\n\n}).call(this);\n",
-      "type": "blob"
-    },
-    "test/loading": {
-      "path": "test/loading",
-      "content": "(function() {\n  var DataLoader;\n\n  mocha.globals(['jQuery*']);\n\n  DataLoader = require(\"../data_loader\");\n\n  describe(\"Character loading\", function() {\n    return it(\"should load data from remote spreadsheets\", function(done) {\n      return DataLoader.characters().then(function(characters) {\n        console.log(characters);\n        return done();\n      }).done();\n    });\n  });\n\n  describe(\"Name loading\", function() {\n    return it(\"should load name data from remote spreadsheets\", function(done) {\n      return DataLoader.names().then(function(names) {\n        console.log(names);\n        return done();\n      }).done();\n    });\n  });\n\n}).call(this);\n",
-      "type": "blob"
-    },
-    "main": {
-      "path": "main",
-      "content": "(function() {\n  module.exports = {\n    Character: require(\"./character\"),\n    Name: require(\"./names\"),\n    Engine: require(\"./lib/engine\")\n  };\n\n}).call(this);\n",
-      "type": "blob"
-    },
-    "test/main": {
-      "path": "test/main",
-      "content": "(function() {\n  var Main;\n\n  Main = require(\"../main\");\n\n  describe(\"main\", function() {\n    return it(\"sholud expose Character\", function() {\n      return assert(Main.Character);\n    });\n  });\n\n}).call(this);\n",
-      "type": "blob"
-    },
     "data_loader": {
       "path": "data_loader",
       "content": "(function() {\n  var Spreadsheet, characterDataTransform, characterFromRemote, get, loader, sheetData;\n\n  Spreadsheet = require(\"spreadsheet\");\n\n  sheetData = null;\n\n  loader = null;\n\n  get = function() {\n    if (loader) {\n      return loader;\n    }\n    loader = Spreadsheet.load(\"0ArtCBkZR37MmdFJqbjloVEp1OFZLWDJ6M29OcXQ1WkE\");\n    return loader;\n  };\n\n  module.exports = {\n    characters: function() {\n      return get().then(function(data) {\n        return characterFromRemote(data.Characters);\n      });\n    },\n    names: function() {\n      return get().then(function(data) {\n        return data.Names.map(function(row) {\n          return {\n            name: row.name.trim(),\n            gender: row.gender.trim(),\n            culture: row.culture.trim()\n          };\n        });\n      });\n    }\n  };\n\n  characterDataTransform = function(data) {\n    var _ref;\n    extend(data, {\n      healthMax: data.healthmax,\n      abilities: data.abilities.split(','),\n      passives: ((_ref = data.passives) != null ? _ref : \"\").split(','),\n      spriteName: data.sprite\n    });\n    delete data.healthmax;\n    delete data.sprite;\n    return data;\n  };\n\n  characterFromRemote = function(data) {\n    var results;\n    console.log(data);\n    results = {};\n    data.forEach(function(datum) {\n      return results[datum.name] = characterDataTransform(datum);\n    });\n    return results;\n  };\n\n}).call(this);\n",
-      "type": "blob"
-    },
-    "names": {
-      "path": "names",
-      "content": "(function() {\n  var ANY;\n\n  ANY = \"*\";\n\n  module.exports = function(data) {\n    return {\n      random: function(options) {\n        var predicate;\n        if (options == null) {\n          options = {};\n        }\n        predicate = function(row) {\n          return (!options.culture || row.culture === options.culture) && (!options.gender || row.gender === ANY || row.gender === options.gender);\n        };\n        return data.filter(predicate).rand().name;\n      }\n    };\n  };\n\n}).call(this);\n",
-      "type": "blob"
-    },
-    "test/names": {
-      "path": "test/names",
-      "content": "(function() {\n  var DataLoader, Names;\n\n  Names = require(\"../names\");\n\n  DataLoader = require(\"../data_loader\");\n\n  DataLoader.names().then(function(data) {\n    var NamePicker;\n    NamePicker = Names(data);\n    return describe(\"Names\", function() {\n      it(\"should pick at random\", function() {\n        var name;\n        name = NamePicker.random();\n        console.log(name);\n        return assert(name);\n      });\n      it(\"should pick a scoped name\", function() {\n        var name;\n        name = NamePicker.random({\n          culture: \"Monster\"\n        });\n        console.log(name);\n        return assert(name);\n      });\n      return it(\"should pick a name scoped by culture and gender\", function() {\n        var name;\n        name = NamePicker.random({\n          culture: \"Humanoid\",\n          gender: \"F\"\n        });\n        console.log(name);\n        return assert(name);\n      });\n    });\n  });\n\n}).call(this);\n",
       "type": "blob"
     },
     "lib/engine": {
@@ -133,9 +106,54 @@ window["distri/tactics-core:master"]({
       "content": "(function() {\n  module.exports = function(I, self) {\n    var animLoop, step;\n    if (I == null) {\n      I = {};\n    }\n    if (self == null) {\n      self = {};\n    }\n    defaults(I, {\n      dt: 1 / 60,\n      t: 0,\n      paused: false,\n      running: false\n    });\n    step = function() {\n      if (!I.paused) {\n        if (typeof self.update === \"function\") {\n          self.update(I.t, I.dt);\n        }\n      }\n      return typeof self.render === \"function\" ? self.render(I.t, I.dt) : void 0;\n    };\n    animLoop = function(timestamp) {\n      step();\n      if (I.running) {\n        return window.requestAnimationFrame(animLoop);\n      }\n    };\n    if (I.running) {\n      window.requestAnimationFrame(animLoop);\n    }\n    return extend(self, {\n      start: function() {\n        if (!I.running) {\n          animLoop();\n          return I.running = true;\n        }\n      },\n      stop: function() {\n        return I.running = false;\n      }\n    });\n  };\n\n}).call(this);\n",
       "type": "blob"
     },
+    "lib/extensions": {
+      "path": "lib/extensions",
+      "content": "(function() {\n  require(\"cornerstone\");\n\n  extend(global, {\n    Model: (function(oldModel) {\n      return function(I, self) {\n        self = oldModel(I, self);\n        extend(self, {\n          attrData: function(name, DataModel) {\n            I[name] = DataModel(I[name]);\n            return self[name] = function(newValue) {\n              if (arguments.length > 0) {\n                return I[name] = DataModel(newValue);\n              } else {\n                return I[name];\n              }\n            };\n          }\n        });\n        return self;\n      };\n    })(Model)\n  });\n\n}).call(this);\n",
+      "type": "blob"
+    },
+    "main": {
+      "path": "main",
+      "content": "(function() {\n  var applyStylesheet;\n\n  applyStylesheet = require(\"util\").applyStylesheet;\n\n  module.exports = {\n    Character: require(\"./character\"),\n    Name: require(\"./names\"),\n    Engine: require(\"./lib/engine\"),\n    init: function() {\n      return applyStylesheet(require(\"./style\"));\n    }\n  };\n\n}).call(this);\n",
+      "type": "blob"
+    },
+    "names": {
+      "path": "names",
+      "content": "(function() {\n  var ANY;\n\n  ANY = \"*\";\n\n  module.exports = function(data) {\n    return {\n      random: function(options) {\n        var predicate;\n        if (options == null) {\n          options = {};\n        }\n        predicate = function(row) {\n          return (!options.culture || row.culture === options.culture) && (!options.gender || row.gender === ANY || row.gender === options.gender);\n        };\n        return data.filter(predicate).rand().name;\n      }\n    };\n  };\n\n}).call(this);\n",
+      "type": "blob"
+    },
+    "pixie": {
+      "path": "pixie",
+      "content": "module.exports = {\"version\":\"0.1.4\",\"entryPoint\":\"main\",\"remoteDependencies\":[\"https://code.jquery.com/jquery-1.10.1.min.js\"],\"dependencies\":{\"cornerstone\":\"distri/cornerstone:v0.2.6\",\"spreadsheet\":\"distri/gdocs-spreadsheet:v0.1.0\",\"util\":\"distri/util:v0.1.0\"}};",
+      "type": "blob"
+    },
+    "test/character": {
+      "path": "test/character",
+      "content": "(function() {\n  var Character;\n\n  Character = require(\"../character\");\n\n  describe(\"Character\", function() {\n    var character;\n    character = Character();\n    it(\"should have health\", function() {\n      return assert(character.health());\n    });\n    it(\"should have actions\", function() {\n      return assert(character.actions());\n    });\n    it(\"should serialize position to JSON\", function() {\n      character.position(Point(5, 2));\n      assert(character.I.position);\n      assert.equal(character.I.position.x, 5);\n      return assert.equal(character.toJSON().position.x, 5);\n    });\n    it(\"should process state based actions\", function() {\n      return character.stateBasedActions();\n    });\n    it(\"should be able to have stats modified by effects\", function() {\n      assert.equal(character.mods(\"strength\"), 0);\n      character.addEffect({\n        attribute: \"strength\",\n        amount: -3\n      });\n      return assert.equal(character.mods(\"strength\"), -3);\n    });\n    it(\"effects should be able to provide damage immunity\", function() {\n      character.addEffect({\n        resistance: 1,\n        type: \"Fire\"\n      });\n      return assert.equal(character.modifiedDamage(999, \"Fire\"), 0);\n    });\n    return it(\"should die when taking a boatload of damage\", function() {\n      var boatload;\n      boatload = 999;\n      character.damage(boatload);\n      character.stateBasedActions();\n      return assert(character.dead());\n    });\n  });\n\n}).call(this);\n",
+      "type": "blob"
+    },
     "test/engine": {
       "path": "test/engine",
       "content": "(function() {\n  var Engine;\n\n  Engine = require(\"../lib/engine\");\n\n  describe(\"engine\", function() {\n    return it(\"should start and stop\", function(done) {\n      var engine;\n      engine = Engine({}, {\n        update: function() {\n          engine.stop();\n          return done();\n        }\n      });\n      return engine.start();\n    });\n  });\n\n}).call(this);\n",
+      "type": "blob"
+    },
+    "test/loading": {
+      "path": "test/loading",
+      "content": "(function() {\n  var DataLoader;\n\n  mocha.globals(['jQuery*']);\n\n  DataLoader = require(\"../data_loader\");\n\n  describe(\"Character loading\", function() {\n    return it(\"should load data from remote spreadsheets\", function(done) {\n      return DataLoader.characters().then(function(characters) {\n        console.log(characters);\n        return done();\n      }).done();\n    });\n  });\n\n  describe(\"Name loading\", function() {\n    return it(\"should load name data from remote spreadsheets\", function(done) {\n      return DataLoader.names().then(function(names) {\n        console.log(names);\n        return done();\n      }).done();\n    });\n  });\n\n}).call(this);\n",
+      "type": "blob"
+    },
+    "test/main": {
+      "path": "test/main",
+      "content": "(function() {\n  var Main;\n\n  Main = require(\"../main\");\n\n  describe(\"main\", function() {\n    it(\"should expose Character\", function() {\n      return assert(Main.Character);\n    });\n    return it(\"should init\", function() {\n      return assert(Main.init());\n    });\n  });\n\n}).call(this);\n",
+      "type": "blob"
+    },
+    "test/names": {
+      "path": "test/names",
+      "content": "(function() {\n  var DataLoader, Names;\n\n  Names = require(\"../names\");\n\n  DataLoader = require(\"../data_loader\");\n\n  DataLoader.names().then(function(data) {\n    var NamePicker;\n    NamePicker = Names(data);\n    return describe(\"Names\", function() {\n      it(\"should pick at random\", function() {\n        var name;\n        name = NamePicker.random();\n        console.log(name);\n        return assert(name);\n      });\n      it(\"should pick a scoped name\", function() {\n        var name;\n        name = NamePicker.random({\n          culture: \"Monster\"\n        });\n        console.log(name);\n        return assert(name);\n      });\n      return it(\"should pick a name scoped by culture and gender\", function() {\n        var name;\n        name = NamePicker.random({\n          culture: \"Humanoid\",\n          gender: \"F\"\n        });\n        console.log(name);\n        return assert(name);\n      });\n    });\n  });\n\n}).call(this);\n",
+      "type": "blob"
+    },
+    "style": {
+      "path": "style",
+      "content": "module.exports = \"* {\\n  -ms-box-sizing: border-box;\\n  -moz-box-sizing: border-box;\\n  -webkit-box-sizing: border-box;\\n  box-sizing: border-box;\\n}\\n\\nhtml {\\n  height: 100%;\\n}\\n\\nbody {\\n  background-color: #000;\\n  color: #080;\\n  font-family: \\\"HelveticaNeue-Light\\\", \\\"Helvetica Neue Light\\\", \\\"Helvetica Neue\\\", Helvetica, Arial, \\\"Lucida Grande\\\", sans-serif;\\n  font-weight: 300;\\n  font-size: 18px;\\n  height: 100%;\\n  margin: 0;\\n  overflow: hidden;\\n  -ms-user-select: none;\\n  -moz-user-select: none;\\n  -webkit-user-select: none;\\n  user-select: none;\\n}\";",
       "type": "blob"
     }
   },
@@ -2531,6 +2549,167 @@ window["distri/tactics-core:master"]({
         "description": "Import data from gdocs.",
         "html_url": "https://github.com/distri/gdocs-spreadsheet",
         "url": "https://api.github.com/repos/distri/gdocs-spreadsheet",
+        "publishBranch": "gh-pages"
+      },
+      "dependencies": {}
+    },
+    "util": {
+      "source": {
+        "LICENSE": {
+          "path": "LICENSE",
+          "mode": "100644",
+          "content": "The MIT License (MIT)\n\nCopyright (c) 2014 \n\nPermission is hereby granted, free of charge, to any person obtaining a copy\nof this software and associated documentation files (the \"Software\"), to deal\nin the Software without restriction, including without limitation the rights\nto use, copy, modify, merge, publish, distribute, sublicense, and/or sell\ncopies of the Software, and to permit persons to whom the Software is\nfurnished to do so, subject to the following conditions:\n\nThe above copyright notice and this permission notice shall be included in all\ncopies or substantial portions of the Software.\n\nTHE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\nIMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\nFITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE\nAUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\nLIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\nOUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE\nSOFTWARE.",
+          "type": "blob"
+        },
+        "README.md": {
+          "path": "README.md",
+          "mode": "100644",
+          "content": "util\n====\n\nSmall utility methods for JS\n",
+          "type": "blob"
+        },
+        "main.coffee.md": {
+          "path": "main.coffee.md",
+          "mode": "100644",
+          "content": "Util\n====\n\n    module.exports =\n      approach: (current, target, amount) ->\n        (target - current).clamp(-amount, amount) + current\n\nApply a stylesheet idempotently.\n\n      applyStylesheet: (style, id=\"primary\") ->\n        styleNode = document.createElement(\"style\")\n        styleNode.innerHTML = style\n        styleNode.id = id\n\n        if previousStyleNode = document.head.querySelector(\"style##{id}\")\n          previousStyleNode.parentNode.removeChild(prevousStyleNode)\n\n        document.head.appendChild(styleNode)\n\n      defaults: (target, objects...) ->\n        for object in objects\n          for name of object\n            unless target.hasOwnProperty(name)\n              target[name] = object[name]\n\n        return target\n\n      extend: (target, sources...) ->\n        for source in sources\n          for name of source\n            target[name] = source[name]\n\n        return target\n",
+          "type": "blob"
+        },
+        "pixie.cson": {
+          "path": "pixie.cson",
+          "mode": "100644",
+          "content": "version: \"0.1.0\"\n",
+          "type": "blob"
+        }
+      },
+      "distribution": {
+        "main": {
+          "path": "main",
+          "content": "(function() {\n  var __slice = [].slice;\n\n  module.exports = {\n    approach: function(current, target, amount) {\n      return (target - current).clamp(-amount, amount) + current;\n    },\n    applyStylesheet: function(style, id) {\n      var previousStyleNode, styleNode;\n      if (id == null) {\n        id = \"primary\";\n      }\n      styleNode = document.createElement(\"style\");\n      styleNode.innerHTML = style;\n      styleNode.id = id;\n      if (previousStyleNode = document.head.querySelector(\"style#\" + id)) {\n        previousStyleNode.parentNode.removeChild(prevousStyleNode);\n      }\n      return document.head.appendChild(styleNode);\n    },\n    defaults: function() {\n      var name, object, objects, target, _i, _len;\n      target = arguments[0], objects = 2 <= arguments.length ? __slice.call(arguments, 1) : [];\n      for (_i = 0, _len = objects.length; _i < _len; _i++) {\n        object = objects[_i];\n        for (name in object) {\n          if (!target.hasOwnProperty(name)) {\n            target[name] = object[name];\n          }\n        }\n      }\n      return target;\n    },\n    extend: function() {\n      var name, source, sources, target, _i, _len;\n      target = arguments[0], sources = 2 <= arguments.length ? __slice.call(arguments, 1) : [];\n      for (_i = 0, _len = sources.length; _i < _len; _i++) {\n        source = sources[_i];\n        for (name in source) {\n          target[name] = source[name];\n        }\n      }\n      return target;\n    }\n  };\n\n}).call(this);\n",
+          "type": "blob"
+        },
+        "pixie": {
+          "path": "pixie",
+          "content": "module.exports = {\"version\":\"0.1.0\"};",
+          "type": "blob"
+        }
+      },
+      "progenitor": {
+        "url": "http://strd6.github.io/editor/"
+      },
+      "version": "0.1.0",
+      "entryPoint": "main",
+      "repository": {
+        "id": 18501018,
+        "name": "util",
+        "full_name": "distri/util",
+        "owner": {
+          "login": "distri",
+          "id": 6005125,
+          "avatar_url": "https://avatars.githubusercontent.com/u/6005125?",
+          "gravatar_id": "192f3f168409e79c42107f081139d9f3",
+          "url": "https://api.github.com/users/distri",
+          "html_url": "https://github.com/distri",
+          "followers_url": "https://api.github.com/users/distri/followers",
+          "following_url": "https://api.github.com/users/distri/following{/other_user}",
+          "gists_url": "https://api.github.com/users/distri/gists{/gist_id}",
+          "starred_url": "https://api.github.com/users/distri/starred{/owner}{/repo}",
+          "subscriptions_url": "https://api.github.com/users/distri/subscriptions",
+          "organizations_url": "https://api.github.com/users/distri/orgs",
+          "repos_url": "https://api.github.com/users/distri/repos",
+          "events_url": "https://api.github.com/users/distri/events{/privacy}",
+          "received_events_url": "https://api.github.com/users/distri/received_events",
+          "type": "Organization",
+          "site_admin": false
+        },
+        "private": false,
+        "html_url": "https://github.com/distri/util",
+        "description": "Small utility methods for JS",
+        "fork": false,
+        "url": "https://api.github.com/repos/distri/util",
+        "forks_url": "https://api.github.com/repos/distri/util/forks",
+        "keys_url": "https://api.github.com/repos/distri/util/keys{/key_id}",
+        "collaborators_url": "https://api.github.com/repos/distri/util/collaborators{/collaborator}",
+        "teams_url": "https://api.github.com/repos/distri/util/teams",
+        "hooks_url": "https://api.github.com/repos/distri/util/hooks",
+        "issue_events_url": "https://api.github.com/repos/distri/util/issues/events{/number}",
+        "events_url": "https://api.github.com/repos/distri/util/events",
+        "assignees_url": "https://api.github.com/repos/distri/util/assignees{/user}",
+        "branches_url": "https://api.github.com/repos/distri/util/branches{/branch}",
+        "tags_url": "https://api.github.com/repos/distri/util/tags",
+        "blobs_url": "https://api.github.com/repos/distri/util/git/blobs{/sha}",
+        "git_tags_url": "https://api.github.com/repos/distri/util/git/tags{/sha}",
+        "git_refs_url": "https://api.github.com/repos/distri/util/git/refs{/sha}",
+        "trees_url": "https://api.github.com/repos/distri/util/git/trees{/sha}",
+        "statuses_url": "https://api.github.com/repos/distri/util/statuses/{sha}",
+        "languages_url": "https://api.github.com/repos/distri/util/languages",
+        "stargazers_url": "https://api.github.com/repos/distri/util/stargazers",
+        "contributors_url": "https://api.github.com/repos/distri/util/contributors",
+        "subscribers_url": "https://api.github.com/repos/distri/util/subscribers",
+        "subscription_url": "https://api.github.com/repos/distri/util/subscription",
+        "commits_url": "https://api.github.com/repos/distri/util/commits{/sha}",
+        "git_commits_url": "https://api.github.com/repos/distri/util/git/commits{/sha}",
+        "comments_url": "https://api.github.com/repos/distri/util/comments{/number}",
+        "issue_comment_url": "https://api.github.com/repos/distri/util/issues/comments/{number}",
+        "contents_url": "https://api.github.com/repos/distri/util/contents/{+path}",
+        "compare_url": "https://api.github.com/repos/distri/util/compare/{base}...{head}",
+        "merges_url": "https://api.github.com/repos/distri/util/merges",
+        "archive_url": "https://api.github.com/repos/distri/util/{archive_format}{/ref}",
+        "downloads_url": "https://api.github.com/repos/distri/util/downloads",
+        "issues_url": "https://api.github.com/repos/distri/util/issues{/number}",
+        "pulls_url": "https://api.github.com/repos/distri/util/pulls{/number}",
+        "milestones_url": "https://api.github.com/repos/distri/util/milestones{/number}",
+        "notifications_url": "https://api.github.com/repos/distri/util/notifications{?since,all,participating}",
+        "labels_url": "https://api.github.com/repos/distri/util/labels{/name}",
+        "releases_url": "https://api.github.com/repos/distri/util/releases{/id}",
+        "created_at": "2014-04-06T22:42:56Z",
+        "updated_at": "2014-04-06T22:42:56Z",
+        "pushed_at": "2014-04-06T22:42:56Z",
+        "git_url": "git://github.com/distri/util.git",
+        "ssh_url": "git@github.com:distri/util.git",
+        "clone_url": "https://github.com/distri/util.git",
+        "svn_url": "https://github.com/distri/util",
+        "homepage": null,
+        "size": 0,
+        "stargazers_count": 0,
+        "watchers_count": 0,
+        "language": null,
+        "has_issues": true,
+        "has_downloads": true,
+        "has_wiki": true,
+        "forks_count": 0,
+        "mirror_url": null,
+        "open_issues_count": 0,
+        "forks": 0,
+        "open_issues": 0,
+        "watchers": 0,
+        "default_branch": "master",
+        "master_branch": "master",
+        "permissions": {
+          "admin": true,
+          "push": true,
+          "pull": true
+        },
+        "organization": {
+          "login": "distri",
+          "id": 6005125,
+          "avatar_url": "https://avatars.githubusercontent.com/u/6005125?",
+          "gravatar_id": "192f3f168409e79c42107f081139d9f3",
+          "url": "https://api.github.com/users/distri",
+          "html_url": "https://github.com/distri",
+          "followers_url": "https://api.github.com/users/distri/followers",
+          "following_url": "https://api.github.com/users/distri/following{/other_user}",
+          "gists_url": "https://api.github.com/users/distri/gists{/gist_id}",
+          "starred_url": "https://api.github.com/users/distri/starred{/owner}{/repo}",
+          "subscriptions_url": "https://api.github.com/users/distri/subscriptions",
+          "organizations_url": "https://api.github.com/users/distri/orgs",
+          "repos_url": "https://api.github.com/users/distri/repos",
+          "events_url": "https://api.github.com/users/distri/events{/privacy}",
+          "received_events_url": "https://api.github.com/users/distri/received_events",
+          "type": "Organization",
+          "site_admin": false
+        },
+        "network_count": 0,
+        "subscribers_count": 2,
+        "branch": "v0.1.0",
         "publishBranch": "gh-pages"
       },
       "dependencies": {}
