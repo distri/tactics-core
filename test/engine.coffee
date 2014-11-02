@@ -21,8 +21,8 @@ describe "engine", ->
 
     setTimeout ->
       console.log c
-      assert c > 50
-      assert c < 70
+      assert c > 58
+      assert c < 62
       engine.stop()
       done()
     , 1000
