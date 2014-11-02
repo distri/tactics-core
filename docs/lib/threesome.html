@@ -35,6 +35,7 @@
               
             </div>
             <div class="content"><pre><code class="lang-coffeescript">Engine = require <span class="string">"./engine"</span>
+Stats = require <span class="string">"stats"</span>
 
 <span class="function"><span class="title">initCamera</span></span> = -&gt;
   aspectRatio = window.innerWidth / window.innerHeight
@@ -71,8 +72,30 @@
 
   resize()
 
+<span class="function"><span class="title">initStats</span></span> = -&gt;
+  updateStats = <span class="keyword">new</span> Stats
+  updateStats.setMode(<span class="number">1</span>)
+  renderStats = <span class="keyword">new</span> Stats
+  renderStats.setMode(<span class="number">1</span>)
+
+  updateStats.domElement.style.position = <span class="string">'absolute'</span>;
+  updateStats.domElement.style.left = <span class="string">'0px'</span>;
+  updateStats.domElement.style.top = <span class="string">'0px'</span>;
+
+  document.body.appendChild( updateStats.domElement );
+
+  renderStats.domElement.style.position = <span class="string">'absolute'</span>;
+  renderStats.domElement.style.right = <span class="string">'0px'</span>;
+  renderStats.domElement.style.top = <span class="string">'0px'</span>;
+
+  document.body.appendChild( renderStats.domElement );
+
+  <span class="keyword">return</span> [updateStats, renderStats]
+
 module.exports =
   init: (data={}, update) -&gt;
+    [updateStats, renderStats] = initStats()
+
     camera = initCamera()
     scene = initScene()
 
@@ -86,12 +109,16 @@ module.exports =
     engine = Engine data.engine,
       update: (t, dt) -&gt;
         <span class="comment"># Update the scene objects!</span>
+        updateStats.begin()
         update(scene, t, dt)
+        updateStats.end()
 
       render: (t, dt) -&gt;
         camera.lookAt scene.position
 
+        renderStats.begin()
         renderer.render scene, camera
+        renderStats.end()
 
     engine.start()</code></pre>
 </div>
