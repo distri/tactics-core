@@ -26,7 +26,7 @@ window["distri/tactics-core:master"]({
     },
     "pixie.cson": {
       "path": "pixie.cson",
-      "content": "version: \"0.1.0\"\nentryPoint: \"character\"\ndependencies:\n  cornerstone: \"distri/cornerstone:v0.2.6\"\n",
+      "content": "version: \"0.1.1\"\nentryPoint: \"character\"\ndependencies:\n  cornerstone: \"distri/cornerstone:v0.2.6\"\n",
       "mode": "100644",
       "type": "blob"
     },
@@ -50,7 +50,7 @@ window["distri/tactics-core:master"]({
     },
     "pixie": {
       "path": "pixie",
-      "content": "module.exports = {\"version\":\"0.1.0\",\"entryPoint\":\"character\",\"dependencies\":{\"cornerstone\":\"distri/cornerstone:v0.2.6\"}};",
+      "content": "module.exports = {\"version\":\"0.1.1\",\"entryPoint\":\"character\",\"dependencies\":{\"cornerstone\":\"distri/cornerstone:v0.2.6\"}};",
       "type": "blob"
     },
     "test/character": {
@@ -62,7 +62,7 @@ window["distri/tactics-core:master"]({
   "progenitor": {
     "url": "http://www.danielx.net/editor/"
   },
-  "version": "0.1.0",
+  "version": "0.1.1",
   "entryPoint": "character",
   "repository": {
     "branch": "master",
