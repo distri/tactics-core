@@ -12,33 +12,16 @@ Data Loader
 
       return loader
 
-    groupBy = (array, attribute) ->
-      array.reduce (grouping, value) ->
-        grouping[value[attribute]] ?= []
-
-        grouping[value[attribute]].push value
-
-        return grouping
-      , {}
-
     module.exports =
       characters: ->
         get().then (data) ->
           characterFromRemote(data.Characters)
       names: ->
         get().then (data) ->
-          names = data.Names.map (row) ->
+          data.Names.map (row) ->
             name: row.name.trim()
             gender: row.gender.trim()
             culture: row.culture.trim()
-
-          cultures = groupBy(names, "culture")
-
-          Object.keys(cultures).forEach (culture) ->
-            cultures[culture] = groupBy(cultures[culture], "gender")
-          , cultures
-
-          return cultures
 
     characterDataTransform = (data) ->
       extend data,
