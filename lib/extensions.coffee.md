@@ -7,6 +7,16 @@ Temporary home for extending cornerstone builtins.
 
     extend global,
 
+Adding a global method to iterate object properties.
+
+      keyValues: (object, fn) ->
+        Object.keys(object).forEach (key) ->
+          value = object[key]
+
+          fn(key, value, object)
+
+        return object
+
 Adding an attrData method to the Model module.
 
       Model: do (oldModel=Model) ->

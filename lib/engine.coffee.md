@@ -28,8 +28,8 @@ Engine
       extend self,
         start: ->
           unless I.running
-            animLoop()
             I.running = true
+            animLoop()
 
         stop: ->
           I.running = false
