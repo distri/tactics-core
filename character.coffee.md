@@ -4,6 +4,8 @@ Character
     require "./lib/extensions"
     require "cornerstone"
 
+    Spreadsheet = require "spreadsheet"
+
 Those little guys that run around.
 
     {sqrt, min, max} = Math
@@ -229,7 +231,7 @@ any status effects.
       return self
 
     dataTransform = (data) ->
-      Object.extend data,
+      extend data,
         healthMax: data.healthmax
         abilities: data.abilities.split(',')
         passives: (data.passives ? "").split(',')
@@ -240,9 +242,13 @@ any status effects.
 
       return data
 
-    module.exports.dataFromRemote = (data) ->
+    fromRemote = (data) ->
       results = {}
       data.forEach (datum) ->
         results[datum.name] = dataTransform(datum)
 
       return results
+
+    module.exports.loadData = ->
+      Spreadsheet.load("0ArtCBkZR37MmdFJqbjloVEp1OFZLWDJ6M29OcXQ1WkE").then (data) ->
+        fromRemote data.Characters

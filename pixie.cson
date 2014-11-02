@@ -1,4 +1,8 @@
-version: "0.1.1"
-entryPoint: "character"
+version: "0.1.2"
+entryPoint: "main"
+remoteDependencies: [
+  "https://code.jquery.com/jquery-1.10.1.min.js"
+]
 dependencies:
   cornerstone: "distri/cornerstone:v0.2.6"
+  spreadsheet: "distri/gdocs-spreadsheet:v0.1.0"
