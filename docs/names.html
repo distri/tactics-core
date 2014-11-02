@@ -2,7 +2,7 @@
 
 <html>
 <head>
-  <title>data_loader</title>
+  <title>names</title>
   <meta http-equiv="content-type" content="text/html; charset=UTF-8">
   <meta name="viewport" content="width=device-width, target-densitydpi=160dpi, initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
   <link rel="stylesheet" media="all" href="http://strd6.github.io/cdn/parallel/docco.css" />
@@ -18,7 +18,7 @@
               <div class="pilwrap">
                 <a class="pilcrow" href="#section-1">&#182;</a>
               </div>
-              <h1 id="data-loader">Data Loader</h1>
+              <h1 id="names">Names</h1>
 
             </div>
             <div class="content"><pre><code class="lang-coffeescript">
@@ -34,47 +34,16 @@
               </div>
               
             </div>
-            <div class="content"><pre><code class="lang-coffeescript">Spreadsheet = require <span class="string">"spreadsheet"</span>
-sheetData = <span class="literal">null</span>
+            <div class="content"><pre><code class="lang-coffeescript">ANY = <span class="string">"*"</span>
 
-loader = <span class="literal">null</span>
-<span class="function"><span class="title">get</span></span> = -&gt;
-  <span class="keyword">return</span> loader <span class="keyword">if</span> loader
-
-  loader = Spreadsheet.load(<span class="string">"0ArtCBkZR37MmdFJqbjloVEp1OFZLWDJ6M29OcXQ1WkE"</span>)
-
-  <span class="keyword">return</span> loader
-
-module.exports =
-  characters: -&gt;
-    get().<span class="keyword">then</span> (data) -&gt;
-      characterFromRemote(data.Characters)
-  names: -&gt;
-    get().<span class="keyword">then</span> (data) -&gt;
-      data.Names.map (row) -&gt;
-        name: row.name.trim()
-        gender: row.gender.trim()
-        culture: row.culture.trim()
-
-<span class="function"><span class="title">characterDataTransform</span></span> = (data) -&gt;
-  extend data,
-    healthMax: data.healthmax
-    abilities: data.abilities.split(<span class="string">','</span>)
-    passives: (data.passives ? <span class="string">""</span>).split(<span class="string">','</span>)
-    spriteName: data.sprite
-
-  <span class="keyword">delete</span> data.healthmax
-  <span class="keyword">delete</span> data.sprite
-
-  <span class="keyword">return</span> data
-
-<span class="function"><span class="title">characterFromRemote</span></span> = (data) -&gt;
-  console.log data
-  results = {}
-  data.forEach (datum) -&gt;
-    results[datum.name] = characterDataTransform(datum)
-
-  <span class="keyword">return</span> results</code></pre>
+module.<span class="function"><span class="title">exports</span></span> = (data) -&gt;
+  random: (options={}) -&gt;
+    <span class="function"><span class="title">predicate</span></span> = (row) -&gt;
+      (!options.culture <span class="keyword">or</span> row.culture <span class="keyword">is</span> options.culture) <span class="keyword">and</span>
+      (!options.gender <span class="keyword">or</span> row.gender <span class="keyword">is</span> ANY <span class="keyword">or</span> row.gender <span class="keyword">is</span> options.gender)
+    data.filter(predicate)
+    .rand()
+    .name</code></pre>
 </div>
         </li>
         

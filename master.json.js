@@ -43,7 +43,7 @@ window["distri/tactics-core:master"]({
     },
     "main.coffee.md": {
       "path": "main.coffee.md",
-      "content": "Tactics Core\n============\n\nData structures that make up the core of Tactis Game.\n\n    module.exports =\n      Character: require \"./character\"\n",
+      "content": "Tactics Core\n============\n\nData structures that make up the core of Tactis Game.\n\n    module.exports =\n      Character: require \"./character\"\n      Name: require \"./names\"\n",
       "mode": "100644"
     },
     "test/main.coffee": {
@@ -53,7 +53,17 @@ window["distri/tactics-core:master"]({
     },
     "data_loader.coffee.md": {
       "path": "data_loader.coffee.md",
-      "content": "Data Loader\n===========\n\n    Spreadsheet = require \"spreadsheet\"\n    sheetData = null\n\n    loader = null\n    get = ->\n      return loader if loader\n\n      loader = Spreadsheet.load(\"0ArtCBkZR37MmdFJqbjloVEp1OFZLWDJ6M29OcXQ1WkE\")\n\n      return loader\n\n    groupBy = (array, attribute) ->\n      array.reduce (grouping, value) ->\n        grouping[value[attribute]] ?= []\n\n        grouping[value[attribute]].push value\n\n        return grouping\n      , {}\n\n    module.exports =\n      characters: ->\n        get().then (data) ->\n          characterFromRemote(data.Characters)\n      names: ->\n        get().then (data) ->\n          names = data.Names.map (row) ->\n            name: row.name.trim()\n            gender: row.gender.trim()\n            culture: row.culture.trim()\n\n          cultures = groupBy(names, \"culture\")\n\n          Object.keys(cultures).forEach (culture) ->\n            cultures[culture] = groupBy(cultures[culture], \"gender\")\n          , cultures\n\n          return cultures\n\n    characterDataTransform = (data) ->\n      extend data,\n        healthMax: data.healthmax\n        abilities: data.abilities.split(',')\n        passives: (data.passives ? \"\").split(',')\n        spriteName: data.sprite\n\n      delete data.healthmax\n      delete data.sprite\n\n      return data\n\n    characterFromRemote = (data) ->\n      console.log data\n      results = {}\n      data.forEach (datum) ->\n        results[datum.name] = characterDataTransform(datum)\n\n      return results\n",
+      "content": "Data Loader\n===========\n\n    Spreadsheet = require \"spreadsheet\"\n    sheetData = null\n\n    loader = null\n    get = ->\n      return loader if loader\n\n      loader = Spreadsheet.load(\"0ArtCBkZR37MmdFJqbjloVEp1OFZLWDJ6M29OcXQ1WkE\")\n\n      return loader\n\n    module.exports =\n      characters: ->\n        get().then (data) ->\n          characterFromRemote(data.Characters)\n      names: ->\n        get().then (data) ->\n          data.Names.map (row) ->\n            name: row.name.trim()\n            gender: row.gender.trim()\n            culture: row.culture.trim()\n\n    characterDataTransform = (data) ->\n      extend data,\n        healthMax: data.healthmax\n        abilities: data.abilities.split(',')\n        passives: (data.passives ? \"\").split(',')\n        spriteName: data.sprite\n\n      delete data.healthmax\n      delete data.sprite\n\n      return data\n\n    characterFromRemote = (data) ->\n      console.log data\n      results = {}\n      data.forEach (datum) ->\n        results[datum.name] = characterDataTransform(datum)\n\n      return results\n",
+      "mode": "100644"
+    },
+    "names.coffee.md": {
+      "path": "names.coffee.md",
+      "content": "Names\n=====\n\n    ANY = \"*\"\n\n    module.exports = (data) ->\n      random: (options={}) ->\n        predicate = (row) ->\n          (!options.culture or row.culture is options.culture) and\n          (!options.gender or row.gender is ANY or row.gender is options.gender)\n        data.filter(predicate)\n        .rand()\n        .name\n",
+      "mode": "100644"
+    },
+    "test/names.coffee": {
+      "path": "test/names.coffee",
+      "content": "Names = require \"../names\"\nDataLoader = require \"../data_loader\"\n\nDataLoader.names().then (data) ->\n  NamePicker = Names(data)\n\n  describe \"Names\", ->\n    it \"should pick at random\", ->\n      name = NamePicker.random()\n\n      console.log name\n      assert name\n\n    it \"should pick a scoped name\", ->\n      name = NamePicker.random\n        culture: \"Monster\"\n\n      console.log name\n      assert name\n\n    it \"should pick a name scoped by culture and gender\", ->\n      name = NamePicker.random\n        culture: \"Humanoid\"\n        gender: \"F\"\n\n      console.log name\n      assert name\n",
       "mode": "100644"
     }
   },
@@ -85,7 +95,7 @@ window["distri/tactics-core:master"]({
     },
     "main": {
       "path": "main",
-      "content": "(function() {\n  module.exports = {\n    Character: require(\"./character\")\n  };\n\n}).call(this);\n",
+      "content": "(function() {\n  module.exports = {\n    Character: require(\"./character\"),\n    Name: require(\"./names\")\n  };\n\n}).call(this);\n",
       "type": "blob"
     },
     "test/main": {
@@ -95,7 +105,17 @@ window["distri/tactics-core:master"]({
     },
     "data_loader": {
       "path": "data_loader",
-      "content": "(function() {\n  var Spreadsheet, characterDataTransform, characterFromRemote, get, groupBy, loader, sheetData;\n\n  Spreadsheet = require(\"spreadsheet\");\n\n  sheetData = null;\n\n  loader = null;\n\n  get = function() {\n    if (loader) {\n      return loader;\n    }\n    loader = Spreadsheet.load(\"0ArtCBkZR37MmdFJqbjloVEp1OFZLWDJ6M29OcXQ1WkE\");\n    return loader;\n  };\n\n  groupBy = function(array, attribute) {\n    return array.reduce(function(grouping, value) {\n      var _name;\n      if (grouping[_name = value[attribute]] == null) {\n        grouping[_name] = [];\n      }\n      grouping[value[attribute]].push(value);\n      return grouping;\n    }, {});\n  };\n\n  module.exports = {\n    characters: function() {\n      return get().then(function(data) {\n        return characterFromRemote(data.Characters);\n      });\n    },\n    names: function() {\n      return get().then(function(data) {\n        var cultures, names;\n        names = data.Names.map(function(row) {\n          return {\n            name: row.name.trim(),\n            gender: row.gender.trim(),\n            culture: row.culture.trim()\n          };\n        });\n        cultures = groupBy(names, \"culture\");\n        Object.keys(cultures).forEach(function(culture) {\n          return cultures[culture] = groupBy(cultures[culture], \"gender\");\n        }, cultures);\n        return cultures;\n      });\n    }\n  };\n\n  characterDataTransform = function(data) {\n    var _ref;\n    extend(data, {\n      healthMax: data.healthmax,\n      abilities: data.abilities.split(','),\n      passives: ((_ref = data.passives) != null ? _ref : \"\").split(','),\n      spriteName: data.sprite\n    });\n    delete data.healthmax;\n    delete data.sprite;\n    return data;\n  };\n\n  characterFromRemote = function(data) {\n    var results;\n    console.log(data);\n    results = {};\n    data.forEach(function(datum) {\n      return results[datum.name] = characterDataTransform(datum);\n    });\n    return results;\n  };\n\n}).call(this);\n",
+      "content": "(function() {\n  var Spreadsheet, characterDataTransform, characterFromRemote, get, loader, sheetData;\n\n  Spreadsheet = require(\"spreadsheet\");\n\n  sheetData = null;\n\n  loader = null;\n\n  get = function() {\n    if (loader) {\n      return loader;\n    }\n    loader = Spreadsheet.load(\"0ArtCBkZR37MmdFJqbjloVEp1OFZLWDJ6M29OcXQ1WkE\");\n    return loader;\n  };\n\n  module.exports = {\n    characters: function() {\n      return get().then(function(data) {\n        return characterFromRemote(data.Characters);\n      });\n    },\n    names: function() {\n      return get().then(function(data) {\n        return data.Names.map(function(row) {\n          return {\n            name: row.name.trim(),\n            gender: row.gender.trim(),\n            culture: row.culture.trim()\n          };\n        });\n      });\n    }\n  };\n\n  characterDataTransform = function(data) {\n    var _ref;\n    extend(data, {\n      healthMax: data.healthmax,\n      abilities: data.abilities.split(','),\n      passives: ((_ref = data.passives) != null ? _ref : \"\").split(','),\n      spriteName: data.sprite\n    });\n    delete data.healthmax;\n    delete data.sprite;\n    return data;\n  };\n\n  characterFromRemote = function(data) {\n    var results;\n    console.log(data);\n    results = {};\n    data.forEach(function(datum) {\n      return results[datum.name] = characterDataTransform(datum);\n    });\n    return results;\n  };\n\n}).call(this);\n",
+      "type": "blob"
+    },
+    "names": {
+      "path": "names",
+      "content": "(function() {\n  var ANY;\n\n  ANY = \"*\";\n\n  module.exports = function(data) {\n    return {\n      random: function(options) {\n        var predicate;\n        if (options == null) {\n          options = {};\n        }\n        predicate = function(row) {\n          return (!options.culture || row.culture === options.culture) && (!options.gender || row.gender === ANY || row.gender === options.gender);\n        };\n        return data.filter(predicate).rand().name;\n      }\n    };\n  };\n\n}).call(this);\n",
+      "type": "blob"
+    },
+    "test/names": {
+      "path": "test/names",
+      "content": "(function() {\n  var DataLoader, Names;\n\n  Names = require(\"../names\");\n\n  DataLoader = require(\"../data_loader\");\n\n  DataLoader.names().then(function(data) {\n    var NamePicker;\n    NamePicker = Names(data);\n    return describe(\"Names\", function() {\n      it(\"should pick at random\", function() {\n        var name;\n        name = NamePicker.random();\n        console.log(name);\n        return assert(name);\n      });\n      it(\"should pick a scoped name\", function() {\n        var name;\n        name = NamePicker.random({\n          culture: \"Monster\"\n        });\n        console.log(name);\n        return assert(name);\n      });\n      return it(\"should pick a name scoped by culture and gender\", function() {\n        var name;\n        name = NamePicker.random({\n          culture: \"Humanoid\",\n          gender: \"F\"\n        });\n        console.log(name);\n        return assert(name);\n      });\n    });\n  });\n\n}).call(this);\n",
       "type": "blob"
     }
   },
