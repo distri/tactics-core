@@ -6,3 +6,4 @@ remoteDependencies: [
 dependencies:
   cornerstone: "distri/cornerstone:v0.2.6"
   spreadsheet: "distri/gdocs-spreadsheet:v0.1.0"
+  util: "distri/util:v0.1.0"
