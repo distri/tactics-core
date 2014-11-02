@@ -46,7 +46,7 @@ Those little guys that run around.
       ensureNumber = (value) ->
         result = parseFloat(value)
 
-        throw "Invalid number" if isNaN result 
+        throw "Invalid number" if isNaN result
 
         return result
 
@@ -234,7 +234,7 @@ any status effects.
         abilities: data.abilities.split(',')
         passives: (data.passives ? "").split(',')
         spriteName: data.sprite
-      
+
       delete data.healthmax
       delete data.sprite
 
