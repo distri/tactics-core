@@ -1,10 +1,10 @@
 CACHE MANIFEST
-# 1414895367162
+# 1414896598891
 
 CACHE:
 index.html
 master.json.js
-
+https://code.jquery.com/jquery-1.10.1.min.js
 
 NETWORK:
 https://*

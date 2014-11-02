@@ -35,7 +35,9 @@
               
             </div>
             <div class="content"><pre><code class="lang-coffeescript">require <span class="string">"./lib/extensions"</span>
-require <span class="string">"cornerstone"</span></code></pre>
+require <span class="string">"cornerstone"</span>
+
+Spreadsheet = require <span class="string">"spreadsheet"</span></code></pre>
 </div>
         </li>
         
@@ -298,7 +300,7 @@ any status effects.</p>
   <span class="keyword">return</span> self
 
 <span class="function"><span class="title">dataTransform</span></span> = (data) -&gt;
-  Object.extend data,
+  extend data,
     healthMax: data.healthmax
     abilities: data.abilities.split(<span class="string">','</span>)
     passives: (data.passives ? <span class="string">""</span>).split(<span class="string">','</span>)
@@ -309,12 +311,16 @@ any status effects.</p>
 
   <span class="keyword">return</span> data
 
-module.exports.<span class="function"><span class="title">dataFromRemote</span></span> = (data) -&gt;
+<span class="function"><span class="title">fromRemote</span></span> = (data) -&gt;
   results = {}
   data.forEach (datum) -&gt;
     results[datum.name] = dataTransform(datum)
 
-  <span class="keyword">return</span> results</code></pre>
+  <span class="keyword">return</span> results
+
+module.exports.<span class="function"><span class="title">loadData</span></span> = -&gt;
+  Spreadsheet.load(<span class="string">"0ArtCBkZR37MmdFJqbjloVEp1OFZLWDJ6M29OcXQ1WkE"</span>).<span class="keyword">then</span> (data) -&gt;
+    fromRemote data.Characters</code></pre>
 </div>
         </li>
         
