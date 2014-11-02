@@ -229,26 +229,3 @@ any status effects.
           type or "sight"
 
       return self
-
-    dataTransform = (data) ->
-      extend data,
-        healthMax: data.healthmax
-        abilities: data.abilities.split(',')
-        passives: (data.passives ? "").split(',')
-        spriteName: data.sprite
-
-      delete data.healthmax
-      delete data.sprite
-
-      return data
-
-    fromRemote = (data) ->
-      results = {}
-      data.forEach (datum) ->
-        results[datum.name] = dataTransform(datum)
-
-      return results
-
-    module.exports.loadData = ->
-      Spreadsheet.load("0ArtCBkZR37MmdFJqbjloVEp1OFZLWDJ6M29OcXQ1WkE").then (data) ->
-        fromRemote data.Characters
