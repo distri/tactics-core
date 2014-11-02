@@ -209,7 +209,7 @@
     },
     "main.coffee.md": {
       "path": "main.coffee.md",
-      "content": "Tactics Core\n============\n\nData structures that make up the core of Tactis Game.\n\n    module.exports =\n      Character: require \"./character\"\n      Name: require \"./names\"\n",
+      "content": "Tactics Core\n============\n\nData structures that make up the core of Tactis Game.\n\n    module.exports =\n      Character: require \"./character\"\n      Name: require \"./names\"\n      Engine: require \"./lib/engine\"\n",
       "mode": "100644"
     },
     "test/main.coffee": {
@@ -230,6 +230,16 @@
     "test/names.coffee": {
       "path": "test/names.coffee",
       "content": "Names = require \"../names\"\nDataLoader = require \"../data_loader\"\n\nDataLoader.names().then (data) ->\n  NamePicker = Names(data)\n\n  describe \"Names\", ->\n    it \"should pick at random\", ->\n      name = NamePicker.random()\n\n      console.log name\n      assert name\n\n    it \"should pick a scoped name\", ->\n      name = NamePicker.random\n        culture: \"Monster\"\n\n      console.log name\n      assert name\n\n    it \"should pick a name scoped by culture and gender\", ->\n      name = NamePicker.random\n        culture: \"Humanoid\"\n        gender: \"F\"\n\n      console.log name\n      assert name\n",
+      "mode": "100644"
+    },
+    "lib/engine.coffee.md": {
+      "path": "lib/engine.coffee.md",
+      "content": "Engine\n======\n\n    module.exports = (I={}, self={}) ->\n      defaults I,\n        dt: 1/60\n        t: 0\n        paused: false\n        running: false\n\n      step = ->\n        unless I.paused\n          self.update?(I.t, I.dt)\n\n        self.render?(I.t, I.dt)\n\n      animLoop = (timestamp) ->\n        step()\n\n        if I.running\n          window.requestAnimationFrame(animLoop)\n\n      if I.running\n        window.requestAnimationFrame(animLoop)\n\n      extend self,\n        start: ->\n          unless I.running\n            animLoop()\n            I.running = true\n\n        stop: ->\n          I.running = false\n",
+      "mode": "100644"
+    },
+    "test/engine.coffee": {
+      "path": "test/engine.coffee",
+      "content": "Engine = require \"../lib/engine\"\n\ndescribe \"engine\", ->\n  it \"should start and stop\", (done) ->\n    engine = Engine({},\n      update: ->\n        engine.stop()\n        done()\n    )\n\n    engine.start()\n",
       "mode": "100644"
     }
   },
@@ -261,7 +271,7 @@
     },
     "main": {
       "path": "main",
-      "content": "(function() {\n  module.exports = {\n    Character: require(\"./character\"),\n    Name: require(\"./names\")\n  };\n\n}).call(this);\n",
+      "content": "(function() {\n  module.exports = {\n    Character: require(\"./character\"),\n    Name: require(\"./names\"),\n    Engine: require(\"./lib/engine\")\n  };\n\n}).call(this);\n",
       "type": "blob"
     },
     "test/main": {
@@ -282,6 +292,16 @@
     "test/names": {
       "path": "test/names",
       "content": "(function() {\n  var DataLoader, Names;\n\n  Names = require(\"../names\");\n\n  DataLoader = require(\"../data_loader\");\n\n  DataLoader.names().then(function(data) {\n    var NamePicker;\n    NamePicker = Names(data);\n    return describe(\"Names\", function() {\n      it(\"should pick at random\", function() {\n        var name;\n        name = NamePicker.random();\n        console.log(name);\n        return assert(name);\n      });\n      it(\"should pick a scoped name\", function() {\n        var name;\n        name = NamePicker.random({\n          culture: \"Monster\"\n        });\n        console.log(name);\n        return assert(name);\n      });\n      return it(\"should pick a name scoped by culture and gender\", function() {\n        var name;\n        name = NamePicker.random({\n          culture: \"Humanoid\",\n          gender: \"F\"\n        });\n        console.log(name);\n        return assert(name);\n      });\n    });\n  });\n\n}).call(this);\n",
+      "type": "blob"
+    },
+    "lib/engine": {
+      "path": "lib/engine",
+      "content": "(function() {\n  module.exports = function(I, self) {\n    var animLoop, step;\n    if (I == null) {\n      I = {};\n    }\n    if (self == null) {\n      self = {};\n    }\n    defaults(I, {\n      dt: 1 / 60,\n      t: 0,\n      paused: false,\n      running: false\n    });\n    step = function() {\n      if (!I.paused) {\n        if (typeof self.update === \"function\") {\n          self.update(I.t, I.dt);\n        }\n      }\n      return typeof self.render === \"function\" ? self.render(I.t, I.dt) : void 0;\n    };\n    animLoop = function(timestamp) {\n      step();\n      if (I.running) {\n        return window.requestAnimationFrame(animLoop);\n      }\n    };\n    if (I.running) {\n      window.requestAnimationFrame(animLoop);\n    }\n    return extend(self, {\n      start: function() {\n        if (!I.running) {\n          animLoop();\n          return I.running = true;\n        }\n      },\n      stop: function() {\n        return I.running = false;\n      }\n    });\n  };\n\n}).call(this);\n",
+      "type": "blob"
+    },
+    "test/engine": {
+      "path": "test/engine",
+      "content": "(function() {\n  var Engine;\n\n  Engine = require(\"../lib/engine\");\n\n  describe(\"engine\", function() {\n    return it(\"should start and stop\", function(done) {\n      var engine;\n      engine = Engine({}, {\n        update: function() {\n          engine.stop();\n          return done();\n        }\n      });\n      return engine.start();\n    });\n  });\n\n}).call(this);\n",
       "type": "blob"
     }
   },
