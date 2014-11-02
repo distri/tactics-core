@@ -37,12 +37,16 @@
             </div>
             <div class="content"><pre><code class="lang-coffeescript">{applyStylesheet} = require <span class="string">"util"</span>
 
+Threesome = require <span class="string">"./lib/threesome"</span>
+
 module.exports =
   Character: require <span class="string">"./character"</span>
   Name: require <span class="string">"./names"</span>
-  Engine: require <span class="string">"./lib/engine"</span>
-  init: -&gt;
-    applyStylesheet require(<span class="string">"./style"</span>)</code></pre>
+
+  init: (data, update) -&gt;
+    applyStylesheet require(<span class="string">"./style"</span>)
+
+    Threesome.init(data, update)</code></pre>
 </div>
         </li>
         

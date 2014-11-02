@@ -38,7 +38,7 @@ window["distri/tactics-core:master"]({
     },
     "main.coffee.md": {
       "path": "main.coffee.md",
-      "content": "Tactics Core\n============\n\nData structures that make up the core of Tactis Game.\n\n    {applyStylesheet} = require \"util\"\n\n    module.exports =\n      Character: require \"./character\"\n      Name: require \"./names\"\n      Engine: require \"./lib/engine\"\n      init: ->\n        applyStylesheet require(\"./style\")\n",
+      "content": "Tactics Core\n============\n\nData structures that make up the core of Tactis Game.\n\n    {applyStylesheet} = require \"util\"\n\n    Threesome = require \"./lib/threesome\"\n\n    module.exports =\n      Character: require \"./character\"\n      Name: require \"./names\"\n\n      init: (data, update) ->\n        applyStylesheet require(\"./style\")\n\n        Threesome.init(data, update)\n",
       "mode": "100644",
       "type": "blob"
     },
@@ -50,7 +50,7 @@ window["distri/tactics-core:master"]({
     },
     "pixie.cson": {
       "path": "pixie.cson",
-      "content": "version: \"0.1.5\"\nentryPoint: \"main\"\nremoteDependencies: [\n  \"https://code.jquery.com/jquery-1.10.1.min.js\"\n  \"https://cdnjs.cloudflare.com/ajax/libs/three.js/r69/three.min.js\"\n]\ndependencies:\n  cornerstone: \"distri/cornerstone:v0.2.6\"\n  spreadsheet: \"distri/gdocs-spreadsheet:v0.1.0\"\n  util: \"distri/util:v0.1.0\"\n",
+      "content": "version: \"0.1.6\"\nentryPoint: \"main\"\nremoteDependencies: [\n  \"https://code.jquery.com/jquery-1.10.1.min.js\"\n  \"https://cdnjs.cloudflare.com/ajax/libs/three.js/r69/three.min.js\"\n]\ndependencies:\n  cornerstone: \"distri/cornerstone:v0.2.6\"\n  spreadsheet: \"distri/gdocs-spreadsheet:v0.1.0\"\n  util: \"distri/util:v0.1.0\"\n",
       "mode": "100644",
       "type": "blob"
     },
@@ -74,7 +74,7 @@ window["distri/tactics-core:master"]({
     },
     "test/main.coffee": {
       "path": "test/main.coffee",
-      "content": "Main = require \"../main\"\n\ndescribe \"main\", ->\n  it \"should expose Character\", ->\n    assert Main.Character\n\n  it \"should init\", ->\n    assert Main.init()\n",
+      "content": "Main = require \"../main\"\n\ndescribe \"main\", ->\n  it \"should expose Character\", ->\n    assert Main.Character\n\n  it \"should init\", ->\n    assert Main.init({}, ->)\n",
       "mode": "100644",
       "type": "blob"
     },
@@ -91,7 +91,7 @@ window["distri/tactics-core:master"]({
     },
     "lib/threesome.coffee.md": {
       "path": "lib/threesome.coffee.md",
-      "content": "Three JS Starter Kit\n====================\n\n    Engine = require \"./engine\"\n\n    initCamera = ->\n      aspectRatio = window.innerWidth / window.innerHeight\n\n      camera = new THREE.PerspectiveCamera(45, aspectRatio, 1, 2000)\n      camera.position.set 0, 100, 200\n\n      return camera\n\n    initScene = ->\n      lights = require \"./lights\"\n\n      scene = new THREE.Scene()\n      scene.add lights.ambient()\n      scene.add lights.directional()\n\n      return scene\n\n    initFloor = (scene) ->\n      Cube = require \"./cube\"\n\n      [0...10].forEach (x) ->\n        [0...10].forEach (z) ->\n          scene.add Cube(x, z)\n\n    bindWindowEvents = (camera, renderer) ->\n      resize = ->\n        renderer.setSize window.innerWidth, window.innerHeight\n  \n        camera.aspect = window.innerWidth / window.innerHeight\n        camera.updateProjectionMatrix()\n\n      $(window).resize resize\n\n      resize()\n\n    module.exports =\n      init: (data={}, update) ->\n        camera = initCamera()\n        scene = initScene()\n\n        initFloor(scene)\n\n        renderer = new THREE.WebGLRenderer()\n\n        bindWindowEvents(camera, renderer)\n        document.body.appendChild renderer.domElement\n\n        engine = Engine data.engine,\n          update: (t, dt) ->\n            # Update the scene objects!\n            update(scene, t, dt)\n\n          render: (t, dt) ->\n            camera.lookAt scene.position\n\n            renderer.render scene, camera\n\n        engine.start()\n",
+      "content": "Three JS Starter Kit\n====================\n\n    Engine = require \"./engine\"\n\n    initCamera = ->\n      aspectRatio = window.innerWidth / window.innerHeight\n\n      camera = new THREE.PerspectiveCamera(45, aspectRatio, 1, 2000)\n      camera.position.set 0, 100, 200\n\n      return camera\n\n    initScene = ->\n      lights = require \"./lights\"\n\n      scene = new THREE.Scene()\n      scene.add lights.ambient()\n      scene.add lights.directional()\n\n      return scene\n\n    initFloor = (scene) ->\n      Cube = require \"./cube\"\n\n      [0...10].forEach (x) ->\n        [0...10].forEach (z) ->\n          scene.add Cube(x, z)\n\n    bindWindowEvents = (camera, renderer) ->\n      resize = ->\n        renderer.setSize window.innerWidth, window.innerHeight\n\n        camera.aspect = window.innerWidth / window.innerHeight\n        camera.updateProjectionMatrix()\n\n      $(window).resize resize\n\n      resize()\n\n    module.exports =\n      init: (data={}, update) ->\n        camera = initCamera()\n        scene = initScene()\n\n        initFloor(scene)\n\n        renderer = new THREE.WebGLRenderer()\n\n        bindWindowEvents(camera, renderer)\n        document.body.appendChild renderer.domElement\n\n        engine = Engine data.engine,\n          update: (t, dt) ->\n            # Update the scene objects!\n            update(scene, t, dt)\n\n          render: (t, dt) ->\n            camera.lookAt scene.position\n\n            renderer.render scene, camera\n\n        engine.start()\n",
       "mode": "100644"
     },
     "lib/lights.coffee.md": {
@@ -102,11 +102,6 @@ window["distri/tactics-core:master"]({
     "lib/cube.coffee.md": {
       "path": "lib/cube.coffee.md",
       "content": "Cube\n====\n\n    CUBE_SIZE = 10\n\n    geometry = new THREE.BoxGeometry(CUBE_SIZE, CUBE_SIZE, CUBE_SIZE)\n    material = new THREE.MeshBasicMaterial\n      color: 0xffffff\n      wireframe: true\n\n    module.exports = (x, z) ->\n      cube = new THREE.Object3D()\n      cube.position.set(x * CUBE_SIZE, 0, z * CUBE_SIZE)\n\n      mesh = new THREE.Mesh geometry, material\n      cube.add(mesh)\n\n      return cube\n",
-      "mode": "100644"
-    },
-    "test/threesome.coffee": {
-      "path": "test/threesome.coffee",
-      "content": "Three = require \"../lib/threesome\"\n\ndescribe \"menage a trois\", ->\n  it \"should have a scene, a camera, and a renderer\", ->\n    Three.init({}, ->)\n",
       "mode": "100644"
     }
   },
@@ -133,7 +128,7 @@ window["distri/tactics-core:master"]({
     },
     "main": {
       "path": "main",
-      "content": "(function() {\n  var applyStylesheet;\n\n  applyStylesheet = require(\"util\").applyStylesheet;\n\n  module.exports = {\n    Character: require(\"./character\"),\n    Name: require(\"./names\"),\n    Engine: require(\"./lib/engine\"),\n    init: function() {\n      return applyStylesheet(require(\"./style\"));\n    }\n  };\n\n}).call(this);\n",
+      "content": "(function() {\n  var Threesome, applyStylesheet;\n\n  applyStylesheet = require(\"util\").applyStylesheet;\n\n  Threesome = require(\"./lib/threesome\");\n\n  module.exports = {\n    Character: require(\"./character\"),\n    Name: require(\"./names\"),\n    init: function(data, update) {\n      applyStylesheet(require(\"./style\"));\n      return Threesome.init(data, update);\n    }\n  };\n\n}).call(this);\n",
       "type": "blob"
     },
     "names": {
@@ -143,7 +138,7 @@ window["distri/tactics-core:master"]({
     },
     "pixie": {
       "path": "pixie",
-      "content": "module.exports = {\"version\":\"0.1.5\",\"entryPoint\":\"main\",\"remoteDependencies\":[\"https://code.jquery.com/jquery-1.10.1.min.js\",\"https://cdnjs.cloudflare.com/ajax/libs/three.js/r69/three.min.js\"],\"dependencies\":{\"cornerstone\":\"distri/cornerstone:v0.2.6\",\"spreadsheet\":\"distri/gdocs-spreadsheet:v0.1.0\",\"util\":\"distri/util:v0.1.0\"}};",
+      "content": "module.exports = {\"version\":\"0.1.6\",\"entryPoint\":\"main\",\"remoteDependencies\":[\"https://code.jquery.com/jquery-1.10.1.min.js\",\"https://cdnjs.cloudflare.com/ajax/libs/three.js/r69/three.min.js\"],\"dependencies\":{\"cornerstone\":\"distri/cornerstone:v0.2.6\",\"spreadsheet\":\"distri/gdocs-spreadsheet:v0.1.0\",\"util\":\"distri/util:v0.1.0\"}};",
       "type": "blob"
     },
     "test/character": {
@@ -163,7 +158,7 @@ window["distri/tactics-core:master"]({
     },
     "test/main": {
       "path": "test/main",
-      "content": "(function() {\n  var Main;\n\n  Main = require(\"../main\");\n\n  describe(\"main\", function() {\n    it(\"should expose Character\", function() {\n      return assert(Main.Character);\n    });\n    return it(\"should init\", function() {\n      return assert(Main.init());\n    });\n  });\n\n}).call(this);\n",
+      "content": "(function() {\n  var Main;\n\n  Main = require(\"../main\");\n\n  describe(\"main\", function() {\n    it(\"should expose Character\", function() {\n      return assert(Main.Character);\n    });\n    return it(\"should init\", function() {\n      return assert(Main.init({}, function() {}));\n    });\n  });\n\n}).call(this);\n",
       "type": "blob"
     },
     "test/names": {
@@ -190,17 +185,12 @@ window["distri/tactics-core:master"]({
       "path": "lib/cube",
       "content": "(function() {\n  var CUBE_SIZE, geometry, material;\n\n  CUBE_SIZE = 10;\n\n  geometry = new THREE.BoxGeometry(CUBE_SIZE, CUBE_SIZE, CUBE_SIZE);\n\n  material = new THREE.MeshBasicMaterial({\n    color: 0xffffff,\n    wireframe: true\n  });\n\n  module.exports = function(x, z) {\n    var cube, mesh;\n    cube = new THREE.Object3D();\n    cube.position.set(x * CUBE_SIZE, 0, z * CUBE_SIZE);\n    mesh = new THREE.Mesh(geometry, material);\n    cube.add(mesh);\n    return cube;\n  };\n\n}).call(this);\n",
       "type": "blob"
-    },
-    "test/threesome": {
-      "path": "test/threesome",
-      "content": "(function() {\n  var Three;\n\n  Three = require(\"../lib/threesome\");\n\n  describe(\"menage a trois\", function() {\n    return it(\"should have a scene, a camera, and a renderer\", function() {\n      return Three.init({}, function() {});\n    });\n  });\n\n}).call(this);\n",
-      "type": "blob"
     }
   },
   "progenitor": {
     "url": "http://www.danielx.net/editor/"
   },
-  "version": "0.1.5",
+  "version": "0.1.6",
   "entryPoint": "main",
   "remoteDependencies": [
     "https://code.jquery.com/jquery-1.10.1.min.js",
