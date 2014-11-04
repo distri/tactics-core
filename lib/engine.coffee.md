@@ -13,6 +13,7 @@ Engine
       step = ->
         unless I.paused
           self.update?(I.t, I.dt)
+          I.t += I.dt
 
         self.render?(I.t, I.dt)
 

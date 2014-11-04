@@ -1,5 +1,9 @@
 Engine = require "../lib/engine"
 
+equalEnough = (a, b) ->
+  assert (b - a) < 0.0001
+  assert (a - b) < 0.0001
+
 describe "engine", ->
   it "should start and stop", (done) ->
     engine = Engine({},
@@ -14,8 +18,11 @@ describe "engine", ->
     c = 0
 
     engine = Engine {},
-      update: ->
+      update: (t, dt) ->
+        equalEnough(t, c * 1/60)
         c += 1
+
+        assert.equal dt, 1/60
 
     engine.start()
 

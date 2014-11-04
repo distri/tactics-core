@@ -15,10 +15,10 @@ Data Loader
     module.exports =
       characters: ->
         get().then (data) ->
-          characterFromRemote(data.Characters)
+          characterFromRemote(data.characters)
       names: ->
         get().then (data) ->
-          data.Names.map (row) ->
+          data.names.map (row) ->
             name: row.name.trim()
             gender: row.gender.trim()
             culture: row.culture.trim()
