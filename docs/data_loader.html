@@ -48,10 +48,10 @@ loader = <span class="literal">null</span>
 module.exports =
   characters: -&gt;
     get().<span class="keyword">then</span> (data) -&gt;
-      characterFromRemote(data.Characters)
+      characterFromRemote(data.characters)
   names: -&gt;
     get().<span class="keyword">then</span> (data) -&gt;
-      data.Names.map (row) -&gt;
+      data.names.map (row) -&gt;
         name: row.name.trim()
         gender: row.gender.trim()
         culture: row.culture.trim()

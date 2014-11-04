@@ -46,6 +46,7 @@ module.<span class="function"><span class="title">exports</span></span> = (I={},
   <span class="function"><span class="title">step</span></span> = -&gt;
     <span class="keyword">unless</span> I.paused
       self.update?(I.t, I.dt)
+      I.t += I.dt
 
     self.render?(I.t, I.dt)
 
