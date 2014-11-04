@@ -216,7 +216,7 @@
     },
     "pixie.cson": {
       "path": "pixie.cson",
-      "content": "version: \"0.2.1\"\nentryPoint: \"main\"\nremoteDependencies: [\n  \"https://code.jquery.com/jquery-1.10.1.min.js\"\n  \"https://cdnjs.cloudflare.com/ajax/libs/three.js/r69/three.min.js\"\n]\ndependencies:\n  cornerstone: \"distri/cornerstone:v0.2.6\"\n  spreadsheet: \"distri/gdocs-spreadsheet:v0.1.0\"\n  stats: \"distri/stats.js:v0.11.0-pre.1\"\n  util: \"distri/util:v0.1.0\"\n",
+      "content": "version: \"0.2.1\"\nentryPoint: \"main\"\nremoteDependencies: [\n  \"https://code.jquery.com/jquery-1.10.1.min.js\"\n  \"https://cdnjs.cloudflare.com/ajax/libs/three.js/r69/three.min.js\"\n]\ndependencies:\n  cornerstone: \"distri/cornerstone:v0.2.6\"\n  spreadsheet: \"distri/gdocs-spreadsheet:v0.1.0\"\n  stats: \"distri/stats.js:v0.11.0\"\n  util: \"distri/util:v0.1.0\"\n",
       "mode": "100644",
       "type": "blob"
     },
@@ -309,7 +309,7 @@
     },
     "pixie": {
       "path": "pixie",
-      "content": "module.exports = {\"version\":\"0.2.1\",\"entryPoint\":\"main\",\"remoteDependencies\":[\"https://code.jquery.com/jquery-1.10.1.min.js\",\"https://cdnjs.cloudflare.com/ajax/libs/three.js/r69/three.min.js\"],\"dependencies\":{\"cornerstone\":\"distri/cornerstone:v0.2.6\",\"spreadsheet\":\"distri/gdocs-spreadsheet:v0.1.0\",\"stats\":\"distri/stats.js:v0.11.0-pre.1\",\"util\":\"distri/util:v0.1.0\"}};",
+      "content": "module.exports = {\"version\":\"0.2.1\",\"entryPoint\":\"main\",\"remoteDependencies\":[\"https://code.jquery.com/jquery-1.10.1.min.js\",\"https://cdnjs.cloudflare.com/ajax/libs/three.js/r69/three.min.js\"],\"dependencies\":{\"cornerstone\":\"distri/cornerstone:v0.2.6\",\"spreadsheet\":\"distri/gdocs-spreadsheet:v0.1.0\",\"stats\":\"distri/stats.js:v0.11.0\",\"util\":\"distri/util:v0.1.0\"}};",
       "type": "blob"
     },
     "test/character": {
@@ -2781,7 +2781,7 @@
         },
         "pixie.cson": {
           "path": "pixie.cson",
-          "content": "version: \"0.11.0-pre.1\"\nentryPoint: \"lib/stats\"\n",
+          "content": "version: \"0.11.0\"\nentryPoint: \"lib/stats\"\n",
           "mode": "100644"
         }
       },
@@ -2793,17 +2793,17 @@
         },
         "pixie": {
           "path": "pixie",
-          "content": "module.exports = {\"version\":\"0.11.0-pre.1\",\"entryPoint\":\"lib/stats\"};",
+          "content": "module.exports = {\"version\":\"0.11.0\",\"entryPoint\":\"lib/stats\"};",
           "type": "blob"
         }
       },
       "progenitor": {
         "url": "http://www.danielx.net/editor/"
       },
-      "version": "0.11.0-pre.1",
+      "version": "0.11.0",
       "entryPoint": "lib/stats",
       "repository": {
-        "branch": "v0.11.0-pre.1",
+        "branch": "v0.11.0",
         "default_branch": "master",
         "full_name": "distri/stats.js",
         "homepage": null,
