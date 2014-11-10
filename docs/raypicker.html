@@ -2,7 +2,7 @@
 
 <html>
 <head>
-  <title>lib/threesome</title>
+  <title>raypicker</title>
   <meta http-equiv="content-type" content="text/html; charset=UTF-8">
   <meta name="viewport" content="width=device-width, target-densitydpi=160dpi, initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
   <link rel="stylesheet" media="all" href="http://strd6.github.io/cdn/parallel/docco.css" />
@@ -18,7 +18,7 @@
               <div class="pilwrap">
                 <a class="pilcrow" href="#section-1">&#182;</a>
               </div>
-              <h1 id="three-js-starter-kit">Three JS Starter Kit</h1>
+              <h1 id="raypicker">Raypicker</h1>
 
             </div>
             <div class="content"><pre><code class="lang-coffeescript">
@@ -32,101 +32,36 @@
               <div class="pilwrap">
                 <a class="pilcrow" href="#section-2">&#182;</a>
               </div>
-              
+              <p>Select an object using raycasting in THREE.js</p>
+
             </div>
-            <div class="content"><pre><code class="lang-coffeescript">Engine = require <span class="string">"./engine"</span>
-Stats = require <span class="string">"stats"</span>
+            <div class="content"><pre><code class="lang-coffeescript">raycaster = <span class="keyword">new</span> THREE.Raycaster()
 
-<span class="function"><span class="title">initCamera</span></span> = -&gt;
-  aspectRatio = window.innerWidth / window.innerHeight
+<span class="function"><span class="title">mouseEventToVector</span></span> = (event) -&gt;
 
-  camera = <span class="keyword">new</span> THREE.PerspectiveCamera(<span class="number">45</span>, aspectRatio, <span class="number">1</span>, <span class="number">2000</span>)
-  camera.position.set <span class="number">0</span>, <span class="number">100</span>, <span class="number">200</span>
+  vector = <span class="keyword">new</span> THREE.Vector3()
+  vector.set( 
+    ( event.clientX / window.innerWidth ) * <span class="number">2</span> - <span class="number">1</span>, 
+    - ( event.clientY / window.innerHeight ) * <span class="number">2</span> + <span class="number">1</span>, 
+    <span class="number">0.5</span>
+  )
 
-  <span class="keyword">return</span> camera
+  <span class="keyword">return</span> vector
 
-<span class="function"><span class="title">initScene</span></span> = -&gt;
-  lights = require <span class="string">"./lights"</span>
+<span class="function"><span class="title">pick</span></span> = (vector, objects, camera) -&gt;
+  vector.unproject( camera )
 
-  scene = <span class="keyword">new</span> THREE.Scene()
-  scene.add lights.ambient()
-  scene.add lights.directional()
+  raycaster.ray.set( camera.position, vector.sub( camera.position ).normalize() )
 
-  <span class="keyword">return</span> scene
+  intersects = raycaster.intersectObjects( objects )
 
-<span class="function"><span class="title">initFloor</span></span> = (scene) -&gt;
-  Cube = require <span class="string">"./cube"</span>
+module.<span class="function"><span class="title">exports</span></span> = (objects, camera) -&gt;
+  (event) -&gt;
+    event.preventDefault()
 
-  [<span class="number">0.</span>.<span class="number">.10</span>].forEach (x) -&gt;
-    [<span class="number">0.</span>.<span class="number">.10</span>].forEach (z) -&gt;
-      scene.add Cube(x, z)
+    vector = mouseEventToVector(event)
 
-<span class="function"><span class="title">bindWindowEvents</span></span> = (camera, renderer) -&gt;
-  <span class="function"><span class="title">resize</span></span> = -&gt;
-    renderer.setSize window.innerWidth, window.innerHeight
-
-    camera.aspect = window.innerWidth / window.innerHeight
-    camera.updateProjectionMatrix()
-
-  $(window).resize resize
-
-  resize()
-
-<span class="function"><span class="title">initStats</span></span> = -&gt;
-  updateStats = <span class="keyword">new</span> Stats
-  updateStats.setMode(<span class="number">1</span>)
-  renderStats = <span class="keyword">new</span> Stats
-  renderStats.setMode(<span class="number">1</span>)
-
-  updateStats.domElement.style.position = <span class="string">'absolute'</span>;
-  updateStats.domElement.style.left = <span class="string">'0px'</span>;
-  updateStats.domElement.style.top = <span class="string">'0px'</span>;
-
-  document.body.appendChild( updateStats.domElement );
-
-  renderStats.domElement.style.position = <span class="string">'absolute'</span>;
-  renderStats.domElement.style.right = <span class="string">'0px'</span>;
-  renderStats.domElement.style.top = <span class="string">'0px'</span>;
-
-  document.body.appendChild( renderStats.domElement );
-
-  <span class="keyword">return</span> [updateStats, renderStats]
-
-module.exports =
-  init: (data={}, update) -&gt;
-    [updateStats, renderStats] = initStats()
-
-    camera = initCamera()
-    scene = initScene()
-
-    initFloor(scene)
-
-    renderer = <span class="keyword">new</span> THREE.WebGLRenderer()
-
-    bindWindowEvents(camera, renderer)
-    document.body.appendChild renderer.domElement
-
-    engine = Engine data.engine,
-      update: (t, dt) -&gt;
-        <span class="comment"># Update the scene objects!</span>
-        updateStats.begin()
-        update(scene, t, dt)
-        updateStats.end()
-
-      render: (t, dt) -&gt;
-        camera.lookAt scene.position
-
-        renderStats.begin()
-        renderer.render scene, camera
-        renderStats.end()
-
-    engine.start()
-
-  click: (event) -&gt;
-    x = (event.clientX / window.innerWidth) * <span class="number">2</span> - <span class="number">1</span>
-    y = -(event_info.clientY / window.innerHeight) * <span class="number">2</span> + <span class="number">1</span>
-
-    mouse = <span class="keyword">new</span> THREE.Vector3(x, y, <span class="number">1</span>)</code></pre>
+    pick(vector, objects, camera)</code></pre>
 </div>
         </li>
         
@@ -268,6 +203,6 @@ module.exports =
 
 }).call(this);
 
-</script><script src="../package.js"></script>
+</script><script src="package.js"></script>
 </body>
 </html>

@@ -190,6 +190,12 @@
       "mode": "100644",
       "type": "blob"
     },
+    "lib/cube.coffee.md": {
+      "path": "lib/cube.coffee.md",
+      "content": "Cube\n====\n\n    CUBE_SIZE = 10\n\n    geometry = new THREE.BoxGeometry(CUBE_SIZE, CUBE_SIZE, CUBE_SIZE)\n    material = new THREE.MeshBasicMaterial\n      color: 0xffffff\n      wireframe: true\n\n    module.exports = (x, z) ->\n      cube = new THREE.Object3D()\n      cube.position.set(x * CUBE_SIZE, -CUBE_SIZE/2, z * CUBE_SIZE)\n\n      mesh = new THREE.Mesh geometry, material\n      cube.add(mesh)\n\n      return cube\n",
+      "mode": "100644",
+      "type": "blob"
+    },
     "lib/engine.coffee.md": {
       "path": "lib/engine.coffee.md",
       "content": "Engine\n======\n \n    require \"cornerstone\"\n\n    module.exports = (I={}, self={}) ->\n      defaults I,\n        dt: 1/60\n        t: 0\n        paused: false\n        running: false\n\n      step = ->\n        unless I.paused\n          self.update?(I.t, I.dt)\n          I.t += I.dt\n\n        self.render?(I.t, I.dt)\n\n      animLoop = (timestamp) ->\n        step()\n\n        if I.running\n          window.requestAnimationFrame(animLoop)\n\n      if I.running\n        window.requestAnimationFrame(animLoop)\n\n      extend self,\n        start: ->\n          unless I.running\n            I.running = true\n            animLoop()\n\n        stop: ->\n          I.running = false\n",
@@ -199,6 +205,18 @@
     "lib/extensions.coffee.md": {
       "path": "lib/extensions.coffee.md",
       "content": "Extensions\n==========\n\n    require \"cornerstone\"\n\nTemporary home for extending cornerstone builtins.\n\n    extend global,\n\nAdding a global method to iterate object properties.\n\n      keyValues: (object, fn) ->\n        Object.keys(object).forEach (key) ->\n          value = object[key]\n\n          fn(key, value, object)\n\n        return object\n\nAdding an attrData method to the Model module.\n\n      Model: do (oldModel=Model) ->\n        (I, self) ->\n          self = oldModel(I, self)\n\n          extend self,\n\n`attrData` models an attribute as a data object. For example if our object has\na position attribute with x and y values we can do\n\n>     self.attrData(\"position\", Point)\n\nto promote the raw data into a Point data model available through a public\nmethod named position.\n\n            attrData: (name, DataModel) ->\n              I[name] = DataModel(I[name])\n\n              self[name] = (newValue) ->\n                if arguments.length > 0\n                  I[name] = DataModel(newValue)\n                else\n                  I[name]\n\n          return self\n",
+      "mode": "100644",
+      "type": "blob"
+    },
+    "lib/lights.coffee.md": {
+      "path": "lib/lights.coffee.md",
+      "content": "Lights\n======\n\n    exports.ambient = ->\n      new THREE.AmbientLight 0x101030\n\n    exports.directional = ->\n      directionalLight = new THREE.DirectionalLight 0xffeedd\n      directionalLight.position.set 0, 0, 10\n\n      directionalLight\n",
+      "mode": "100644",
+      "type": "blob"
+    },
+    "lib/threesome.coffee.md": {
+      "path": "lib/threesome.coffee.md",
+      "content": "Three JS Starter Kit\n====================\n\n    Engine = require \"./engine\"\n    Stats = require \"stats\"\n\n    initCamera = ->\n      aspectRatio = window.innerWidth / window.innerHeight\n\n      camera = new THREE.PerspectiveCamera(45, aspectRatio, 1, 2000)\n      camera.position.set 0, 100, 200\n\n      return camera\n\n    initScene = ->\n      lights = require \"./lights\"\n\n      scene = new THREE.Scene()\n      scene.add lights.ambient()\n      scene.add lights.directional()\n\n      return scene\n\n    initFloor = (scene) ->\n      Cube = require \"./cube\"\n\n      [0...10].forEach (x) ->\n        [0...10].forEach (z) ->\n          scene.add Cube(x, z)\n\n    bindWindowEvents = (camera, renderer) ->\n      resize = ->\n        renderer.setSize window.innerWidth, window.innerHeight\n\n        camera.aspect = window.innerWidth / window.innerHeight\n        camera.updateProjectionMatrix()\n\n      $(window).resize resize\n\n      resize()\n\n    initStats = ->\n      updateStats = new Stats\n      updateStats.setMode(1)\n      renderStats = new Stats\n      renderStats.setMode(1)\n\n      updateStats.domElement.style.position = 'absolute';\n      updateStats.domElement.style.left = '0px';\n      updateStats.domElement.style.top = '0px';\n\n      document.body.appendChild( updateStats.domElement );\n\n      renderStats.domElement.style.position = 'absolute';\n      renderStats.domElement.style.right = '0px';\n      renderStats.domElement.style.top = '0px';\n\n      document.body.appendChild( renderStats.domElement );\n\n      return [updateStats, renderStats]\n\n    module.exports =\n      init: (data={}, update) ->\n        [updateStats, renderStats] = initStats()\n\n        camera = initCamera()\n        scene = initScene()\n\n        initFloor(scene)\n\n        renderer = new THREE.WebGLRenderer()\n\n        bindWindowEvents(camera, renderer)\n        document.body.appendChild renderer.domElement\n\n        engine = Engine data.engine,\n          update: (t, dt) ->\n            # Update the scene objects!\n            updateStats.begin()\n            update(scene, t, dt)\n            updateStats.end()\n\n          render: (t, dt) ->\n            camera.lookAt scene.position\n\n            renderStats.begin()\n            renderer.render scene, camera\n            renderStats.end()\n\n        engine.start()\n\n      click: (event) ->\n        x = (event.clientX / window.innerWidth) * 2 - 1\n        y = -(event_info.clientY / window.innerHeight) * 2 + 1\n\n        mouse = new THREE.Vector3(x, y, 1)\n",
       "mode": "100644",
       "type": "blob"
     },
@@ -220,6 +238,12 @@
       "mode": "100644",
       "type": "blob"
     },
+    "style.styl": {
+      "path": "style.styl",
+      "content": "*\n  box-sizing: border-box\n\nhtml\n  height: 100%\n\nbody\n  background-color: #000\n  color: #080\n  font-family: \"HelveticaNeue-Light\", \"Helvetica Neue Light\", \"Helvetica Neue\", Helvetica, Arial, \"Lucida Grande\", sans-serif\n  font-weight: 300\n  font-size: 18px\n  height: 100%\n  margin: 0\n  overflow: hidden\n  user-select: none\n",
+      "mode": "100644",
+      "type": "blob"
+    },
     "test/character.coffee": {
       "path": "test/character.coffee",
       "content": "Character = require \"../character\"\n\ndescribe \"Character\", ->\n  character = Character()\n\n  it \"should have health\", ->\n    assert character.health()\n\n  it \"should have actions\", ->\n    assert character.actions()\n\n  it \"should serialize position to JSON\", ->\n    character.position Point(5, 2)\n\n    assert character.I.position\n    assert.equal character.I.position.x, 5\n\n    assert.equal character.toJSON().position.x, 5\n\n  it \"should process state based actions\", ->\n    character.stateBasedActions()\n\n  it \"should be able to have stats modified by effects\", ->\n    assert.equal character.mods(\"strength\"), 0\n\n    character.addEffect\n      attribute: \"strength\"\n      amount: -3\n\n    assert.equal character.mods(\"strength\"), -3\n\n  it \"effects should be able to provide damage immunity\", ->\n    character.addEffect\n      resistance: 1\n      type: \"Fire\"\n\n    assert.equal character.modifiedDamage(999, \"Fire\"), 0\n\n  it \"should die when taking a boatload of damage\", ->\n    boatload = 999\n\n    character.damage boatload\n    character.stateBasedActions()\n\n    assert character.dead()\n",
@@ -229,6 +253,12 @@
     "test/engine.coffee": {
       "path": "test/engine.coffee",
       "content": "Engine = require \"../lib/engine\"\n\nequalEnough = (a, b) ->\n  assert (b - a) < 0.0001\n  assert (a - b) < 0.0001\n\ndescribe \"engine\", ->\n  it \"should start and stop\", (done) ->\n    engine = Engine({},\n      update: ->\n        engine.stop()\n        done()\n    )\n\n    engine.start()\n\n  it \"should update about 60 times a second\", (done) ->\n    c = 0\n\n    engine = Engine {},\n      update: (t, dt) ->\n        equalEnough(t, c * 1/60)\n        c += 1\n\n        assert.equal dt, 1/60\n\n    engine.start()\n\n    setTimeout ->\n      console.log c\n      assert c > 58\n      assert c < 62\n      engine.stop()\n      done()\n    , 1000\n",
+      "mode": "100644",
+      "type": "blob"
+    },
+    "test/key_values.coffee": {
+      "path": "test/key_values.coffee",
+      "content": "describe \"keyValues\", ->\n  it \"should iterate keys and values of an object\", (done) ->\n    o = \n      test: \"value\"\n\n    keyValues o, (key, value) ->\n      assert.equal key, \"test\"\n      assert.equal value, \"value\"\n\n      done()\n",
       "mode": "100644",
       "type": "blob"
     },
@@ -250,29 +280,9 @@
       "mode": "100644",
       "type": "blob"
     },
-    "style.styl": {
-      "path": "style.styl",
-      "content": "*\n  box-sizing: border-box\n\nhtml\n  height: 100%\n\nbody\n  background-color: #000\n  color: #080\n  font-family: \"HelveticaNeue-Light\", \"Helvetica Neue Light\", \"Helvetica Neue\", Helvetica, Arial, \"Lucida Grande\", sans-serif\n  font-weight: 300\n  font-size: 18px\n  height: 100%\n  margin: 0\n  overflow: hidden\n  user-select: none\n",
-      "mode": "100644"
-    },
-    "lib/threesome.coffee.md": {
-      "path": "lib/threesome.coffee.md",
-      "content": "Three JS Starter Kit\n====================\n\n    Engine = require \"./engine\"\n    Stats = require \"stats\"\n\n    initCamera = ->\n      aspectRatio = window.innerWidth / window.innerHeight\n\n      camera = new THREE.PerspectiveCamera(45, aspectRatio, 1, 2000)\n      camera.position.set 0, 100, 200\n\n      return camera\n\n    initScene = ->\n      lights = require \"./lights\"\n\n      scene = new THREE.Scene()\n      scene.add lights.ambient()\n      scene.add lights.directional()\n\n      return scene\n\n    initFloor = (scene) ->\n      Cube = require \"./cube\"\n\n      [0...10].forEach (x) ->\n        [0...10].forEach (z) ->\n          scene.add Cube(x, z)\n\n    bindWindowEvents = (camera, renderer) ->\n      resize = ->\n        renderer.setSize window.innerWidth, window.innerHeight\n\n        camera.aspect = window.innerWidth / window.innerHeight\n        camera.updateProjectionMatrix()\n\n      $(window).resize resize\n\n      resize()\n\n    initStats = ->\n      updateStats = new Stats\n      updateStats.setMode(1)\n      renderStats = new Stats\n      renderStats.setMode(1)\n\n      updateStats.domElement.style.position = 'absolute';\n      updateStats.domElement.style.left = '0px';\n      updateStats.domElement.style.top = '0px';\n\n      document.body.appendChild( updateStats.domElement );\n\n      renderStats.domElement.style.position = 'absolute';\n      renderStats.domElement.style.right = '0px';\n      renderStats.domElement.style.top = '0px';\n\n      document.body.appendChild( renderStats.domElement );\n\n      return [updateStats, renderStats]\n\n    module.exports =\n      init: (data={}, update) ->\n        [updateStats, renderStats] = initStats()\n    \n        camera = initCamera()\n        scene = initScene()\n\n        initFloor(scene)\n\n        renderer = new THREE.WebGLRenderer()\n\n        bindWindowEvents(camera, renderer)\n        document.body.appendChild renderer.domElement\n\n        engine = Engine data.engine,\n          update: (t, dt) ->\n            # Update the scene objects!\n            updateStats.begin()\n            update(scene, t, dt)\n            updateStats.end()\n\n          render: (t, dt) ->\n            camera.lookAt scene.position\n\n            renderStats.begin()\n            renderer.render scene, camera\n            renderStats.end()\n\n        engine.start()\n",
-      "mode": "100644"
-    },
-    "lib/lights.coffee.md": {
-      "path": "lib/lights.coffee.md",
-      "content": "Lights\n======\n\n    exports.ambient = ->\n      new THREE.AmbientLight 0x101030\n\n    exports.directional = ->\n      directionalLight = new THREE.DirectionalLight 0xffeedd\n      directionalLight.position.set 0, 0, 10\n\n      directionalLight\n",
-      "mode": "100644"
-    },
-    "lib/cube.coffee.md": {
-      "path": "lib/cube.coffee.md",
-      "content": "Cube\n====\n\n    CUBE_SIZE = 10\n\n    geometry = new THREE.BoxGeometry(CUBE_SIZE, CUBE_SIZE, CUBE_SIZE)\n    material = new THREE.MeshBasicMaterial\n      color: 0xffffff\n      wireframe: true\n\n    module.exports = (x, z) ->\n      cube = new THREE.Object3D()\n      cube.position.set(x * CUBE_SIZE, -CUBE_SIZE/2, z * CUBE_SIZE)\n\n      mesh = new THREE.Mesh geometry, material\n      cube.add(mesh)\n\n      return cube\n",
-      "mode": "100644"
-    },
-    "test/key_values.coffee": {
-      "path": "test/key_values.coffee",
-      "content": "describe \"keyValues\", ->\n  it \"should iterate keys and values of an object\", (done) ->\n    o = \n      test: \"value\"\n\n    keyValues o, (key, value) ->\n      assert.equal key, \"test\"\n      assert.equal value, \"value\"\n\n      done()\n",
+    "raypicker.coffee.md": {
+      "path": "raypicker.coffee.md",
+      "content": "Raypicker\n=========\n\nSelect an object using raycasting in THREE.js\n\n    raycaster = new THREE.Raycaster()\n\n    mouseEventToVector = (event) ->\n\n      vector = new THREE.Vector3()\n      vector.set( \n        ( event.clientX / window.innerWidth ) * 2 - 1, \n        - ( event.clientY / window.innerHeight ) * 2 + 1, \n        0.5\n      )\n\n      return vector\n\n    pick = (vector, objects, camera) ->\n      vector.unproject( camera )\n\n      raycaster.ray.set( camera.position, vector.sub( camera.position ).normalize() )\n\n      intersects = raycaster.intersectObjects( objects )\n\n    module.exports = (objects, camera) ->\n      (event) ->\n        event.preventDefault()\n\n        vector = mouseEventToVector(event)\n\n        pick(vector, objects, camera)\n",
       "mode": "100644"
     }
   },
@@ -287,6 +297,11 @@
       "content": "(function() {\n  var Spreadsheet, characterDataTransform, characterFromRemote, get, loader, sheetData;\n\n  Spreadsheet = require(\"spreadsheet\");\n\n  sheetData = null;\n\n  loader = null;\n\n  get = function() {\n    if (loader) {\n      return loader;\n    }\n    loader = Spreadsheet.load(\"0ArtCBkZR37MmdFJqbjloVEp1OFZLWDJ6M29OcXQ1WkE\");\n    return loader;\n  };\n\n  module.exports = {\n    characters: function() {\n      return get().then(function(data) {\n        return characterFromRemote(data.characters);\n      });\n    },\n    names: function() {\n      return get().then(function(data) {\n        return data.names.map(function(row) {\n          return {\n            name: row.name.trim(),\n            gender: row.gender.trim(),\n            culture: row.culture.trim()\n          };\n        });\n      });\n    },\n    get: get\n  };\n\n  characterDataTransform = function(data) {\n    var _ref;\n    extend(data, {\n      healthMax: data.healthmax,\n      abilities: data.abilities.split(','),\n      passives: ((_ref = data.passives) != null ? _ref : \"\").split(','),\n      spriteName: data.sprite\n    });\n    delete data.healthmax;\n    delete data.sprite;\n    return data;\n  };\n\n  characterFromRemote = function(data) {\n    var results;\n    console.log(data);\n    results = {};\n    data.forEach(function(datum) {\n      return results[datum.name] = characterDataTransform(datum);\n    });\n    return results;\n  };\n\n}).call(this);\n",
       "type": "blob"
     },
+    "lib/cube": {
+      "path": "lib/cube",
+      "content": "(function() {\n  var CUBE_SIZE, geometry, material;\n\n  CUBE_SIZE = 10;\n\n  geometry = new THREE.BoxGeometry(CUBE_SIZE, CUBE_SIZE, CUBE_SIZE);\n\n  material = new THREE.MeshBasicMaterial({\n    color: 0xffffff,\n    wireframe: true\n  });\n\n  module.exports = function(x, z) {\n    var cube, mesh;\n    cube = new THREE.Object3D();\n    cube.position.set(x * CUBE_SIZE, -CUBE_SIZE / 2, z * CUBE_SIZE);\n    mesh = new THREE.Mesh(geometry, material);\n    cube.add(mesh);\n    return cube;\n  };\n\n}).call(this);\n",
+      "type": "blob"
+    },
     "lib/engine": {
       "path": "lib/engine",
       "content": "(function() {\n  require(\"cornerstone\");\n\n  module.exports = function(I, self) {\n    var animLoop, step;\n    if (I == null) {\n      I = {};\n    }\n    if (self == null) {\n      self = {};\n    }\n    defaults(I, {\n      dt: 1 / 60,\n      t: 0,\n      paused: false,\n      running: false\n    });\n    step = function() {\n      if (!I.paused) {\n        if (typeof self.update === \"function\") {\n          self.update(I.t, I.dt);\n        }\n        I.t += I.dt;\n      }\n      return typeof self.render === \"function\" ? self.render(I.t, I.dt) : void 0;\n    };\n    animLoop = function(timestamp) {\n      step();\n      if (I.running) {\n        return window.requestAnimationFrame(animLoop);\n      }\n    };\n    if (I.running) {\n      window.requestAnimationFrame(animLoop);\n    }\n    return extend(self, {\n      start: function() {\n        if (!I.running) {\n          I.running = true;\n          return animLoop();\n        }\n      },\n      stop: function() {\n        return I.running = false;\n      }\n    });\n  };\n\n}).call(this);\n",
@@ -295,6 +310,16 @@
     "lib/extensions": {
       "path": "lib/extensions",
       "content": "(function() {\n  require(\"cornerstone\");\n\n  extend(global, {\n    keyValues: function(object, fn) {\n      Object.keys(object).forEach(function(key) {\n        var value;\n        value = object[key];\n        return fn(key, value, object);\n      });\n      return object;\n    },\n    Model: (function(oldModel) {\n      return function(I, self) {\n        self = oldModel(I, self);\n        extend(self, {\n          attrData: function(name, DataModel) {\n            I[name] = DataModel(I[name]);\n            return self[name] = function(newValue) {\n              if (arguments.length > 0) {\n                return I[name] = DataModel(newValue);\n              } else {\n                return I[name];\n              }\n            };\n          }\n        });\n        return self;\n      };\n    })(Model)\n  });\n\n}).call(this);\n",
+      "type": "blob"
+    },
+    "lib/lights": {
+      "path": "lib/lights",
+      "content": "(function() {\n  exports.ambient = function() {\n    return new THREE.AmbientLight(0x101030);\n  };\n\n  exports.directional = function() {\n    var directionalLight;\n    directionalLight = new THREE.DirectionalLight(0xffeedd);\n    directionalLight.position.set(0, 0, 10);\n    return directionalLight;\n  };\n\n}).call(this);\n",
+      "type": "blob"
+    },
+    "lib/threesome": {
+      "path": "lib/threesome",
+      "content": "(function() {\n  var Engine, Stats, bindWindowEvents, initCamera, initFloor, initScene, initStats;\n\n  Engine = require(\"./engine\");\n\n  Stats = require(\"stats\");\n\n  initCamera = function() {\n    var aspectRatio, camera;\n    aspectRatio = window.innerWidth / window.innerHeight;\n    camera = new THREE.PerspectiveCamera(45, aspectRatio, 1, 2000);\n    camera.position.set(0, 100, 200);\n    return camera;\n  };\n\n  initScene = function() {\n    var lights, scene;\n    lights = require(\"./lights\");\n    scene = new THREE.Scene();\n    scene.add(lights.ambient());\n    scene.add(lights.directional());\n    return scene;\n  };\n\n  initFloor = function(scene) {\n    var Cube;\n    Cube = require(\"./cube\");\n    return [0, 1, 2, 3, 4, 5, 6, 7, 8, 9].forEach(function(x) {\n      return [0, 1, 2, 3, 4, 5, 6, 7, 8, 9].forEach(function(z) {\n        return scene.add(Cube(x, z));\n      });\n    });\n  };\n\n  bindWindowEvents = function(camera, renderer) {\n    var resize;\n    resize = function() {\n      renderer.setSize(window.innerWidth, window.innerHeight);\n      camera.aspect = window.innerWidth / window.innerHeight;\n      return camera.updateProjectionMatrix();\n    };\n    $(window).resize(resize);\n    return resize();\n  };\n\n  initStats = function() {\n    var renderStats, updateStats;\n    updateStats = new Stats;\n    updateStats.setMode(1);\n    renderStats = new Stats;\n    renderStats.setMode(1);\n    updateStats.domElement.style.position = 'absolute';\n    updateStats.domElement.style.left = '0px';\n    updateStats.domElement.style.top = '0px';\n    document.body.appendChild(updateStats.domElement);\n    renderStats.domElement.style.position = 'absolute';\n    renderStats.domElement.style.right = '0px';\n    renderStats.domElement.style.top = '0px';\n    document.body.appendChild(renderStats.domElement);\n    return [updateStats, renderStats];\n  };\n\n  module.exports = {\n    init: function(data, update) {\n      var camera, engine, renderStats, renderer, scene, updateStats, _ref;\n      if (data == null) {\n        data = {};\n      }\n      _ref = initStats(), updateStats = _ref[0], renderStats = _ref[1];\n      camera = initCamera();\n      scene = initScene();\n      initFloor(scene);\n      renderer = new THREE.WebGLRenderer();\n      bindWindowEvents(camera, renderer);\n      document.body.appendChild(renderer.domElement);\n      engine = Engine(data.engine, {\n        update: function(t, dt) {\n          updateStats.begin();\n          update(scene, t, dt);\n          return updateStats.end();\n        },\n        render: function(t, dt) {\n          camera.lookAt(scene.position);\n          renderStats.begin();\n          renderer.render(scene, camera);\n          return renderStats.end();\n        }\n      });\n      return engine.start();\n    },\n    click: function(event) {\n      var mouse, x, y;\n      x = (event.clientX / window.innerWidth) * 2 - 1;\n      y = -(event_info.clientY / window.innerHeight) * 2 + 1;\n      return mouse = new THREE.Vector3(x, y, 1);\n    }\n  };\n\n}).call(this);\n",
       "type": "blob"
     },
     "main": {
@@ -312,6 +337,11 @@
       "content": "module.exports = {\"version\":\"0.2.2\",\"entryPoint\":\"main\",\"remoteDependencies\":[\"https://code.jquery.com/jquery-1.10.1.min.js\",\"https://cdnjs.cloudflare.com/ajax/libs/three.js/r69/three.min.js\"],\"dependencies\":{\"cornerstone\":\"distri/cornerstone:v0.2.6\",\"spreadsheet\":\"distri/gdocs-spreadsheet:v0.1.0\",\"stats\":\"distri/stats.js:v0.11.0\",\"util\":\"distri/util:v0.1.0\"}};",
       "type": "blob"
     },
+    "style": {
+      "path": "style",
+      "content": "module.exports = \"* {\\n  -ms-box-sizing: border-box;\\n  -moz-box-sizing: border-box;\\n  -webkit-box-sizing: border-box;\\n  box-sizing: border-box;\\n}\\n\\nhtml {\\n  height: 100%;\\n}\\n\\nbody {\\n  background-color: #000;\\n  color: #080;\\n  font-family: \\\"HelveticaNeue-Light\\\", \\\"Helvetica Neue Light\\\", \\\"Helvetica Neue\\\", Helvetica, Arial, \\\"Lucida Grande\\\", sans-serif;\\n  font-weight: 300;\\n  font-size: 18px;\\n  height: 100%;\\n  margin: 0;\\n  overflow: hidden;\\n  -ms-user-select: none;\\n  -moz-user-select: none;\\n  -webkit-user-select: none;\\n  user-select: none;\\n}\";",
+      "type": "blob"
+    },
     "test/character": {
       "path": "test/character",
       "content": "(function() {\n  var Character;\n\n  Character = require(\"../character\");\n\n  describe(\"Character\", function() {\n    var character;\n    character = Character();\n    it(\"should have health\", function() {\n      return assert(character.health());\n    });\n    it(\"should have actions\", function() {\n      return assert(character.actions());\n    });\n    it(\"should serialize position to JSON\", function() {\n      character.position(Point(5, 2));\n      assert(character.I.position);\n      assert.equal(character.I.position.x, 5);\n      return assert.equal(character.toJSON().position.x, 5);\n    });\n    it(\"should process state based actions\", function() {\n      return character.stateBasedActions();\n    });\n    it(\"should be able to have stats modified by effects\", function() {\n      assert.equal(character.mods(\"strength\"), 0);\n      character.addEffect({\n        attribute: \"strength\",\n        amount: -3\n      });\n      return assert.equal(character.mods(\"strength\"), -3);\n    });\n    it(\"effects should be able to provide damage immunity\", function() {\n      character.addEffect({\n        resistance: 1,\n        type: \"Fire\"\n      });\n      return assert.equal(character.modifiedDamage(999, \"Fire\"), 0);\n    });\n    return it(\"should die when taking a boatload of damage\", function() {\n      var boatload;\n      boatload = 999;\n      character.damage(boatload);\n      character.stateBasedActions();\n      return assert(character.dead());\n    });\n  });\n\n}).call(this);\n",
@@ -320,6 +350,11 @@
     "test/engine": {
       "path": "test/engine",
       "content": "(function() {\n  var Engine, equalEnough;\n\n  Engine = require(\"../lib/engine\");\n\n  equalEnough = function(a, b) {\n    assert((b - a) < 0.0001);\n    return assert((a - b) < 0.0001);\n  };\n\n  describe(\"engine\", function() {\n    it(\"should start and stop\", function(done) {\n      var engine;\n      engine = Engine({}, {\n        update: function() {\n          engine.stop();\n          return done();\n        }\n      });\n      return engine.start();\n    });\n    return it(\"should update about 60 times a second\", function(done) {\n      var c, engine;\n      c = 0;\n      engine = Engine({}, {\n        update: function(t, dt) {\n          equalEnough(t, c * 1 / 60);\n          c += 1;\n          return assert.equal(dt, 1 / 60);\n        }\n      });\n      engine.start();\n      return setTimeout(function() {\n        console.log(c);\n        assert(c > 58);\n        assert(c < 62);\n        engine.stop();\n        return done();\n      }, 1000);\n    });\n  });\n\n}).call(this);\n",
+      "type": "blob"
+    },
+    "test/key_values": {
+      "path": "test/key_values",
+      "content": "(function() {\n  describe(\"keyValues\", function() {\n    return it(\"should iterate keys and values of an object\", function(done) {\n      var o;\n      o = {\n        test: \"value\"\n      };\n      return keyValues(o, function(key, value) {\n        assert.equal(key, \"test\");\n        assert.equal(value, \"value\");\n        return done();\n      });\n    });\n  });\n\n}).call(this);\n",
       "type": "blob"
     },
     "test/loading": {
@@ -337,29 +372,9 @@
       "content": "(function() {\n  var DataLoader, Names;\n\n  Names = require(\"../names\");\n\n  DataLoader = require(\"../data_loader\");\n\n  DataLoader.names().then(function(data) {\n    var NamePicker;\n    NamePicker = Names(data);\n    return describe(\"Names\", function() {\n      it(\"should pick at random\", function() {\n        var name;\n        name = NamePicker.random();\n        console.log(name);\n        return assert(name);\n      });\n      it(\"should pick a scoped name\", function() {\n        var name;\n        name = NamePicker.random({\n          culture: \"Monster\"\n        });\n        console.log(name);\n        return assert(name);\n      });\n      return it(\"should pick a name scoped by culture and gender\", function() {\n        var name;\n        name = NamePicker.random({\n          culture: \"Humanoid\",\n          gender: \"F\"\n        });\n        console.log(name);\n        return assert(name);\n      });\n    });\n  });\n\n}).call(this);\n",
       "type": "blob"
     },
-    "style": {
-      "path": "style",
-      "content": "module.exports = \"* {\\n  -ms-box-sizing: border-box;\\n  -moz-box-sizing: border-box;\\n  -webkit-box-sizing: border-box;\\n  box-sizing: border-box;\\n}\\n\\nhtml {\\n  height: 100%;\\n}\\n\\nbody {\\n  background-color: #000;\\n  color: #080;\\n  font-family: \\\"HelveticaNeue-Light\\\", \\\"Helvetica Neue Light\\\", \\\"Helvetica Neue\\\", Helvetica, Arial, \\\"Lucida Grande\\\", sans-serif;\\n  font-weight: 300;\\n  font-size: 18px;\\n  height: 100%;\\n  margin: 0;\\n  overflow: hidden;\\n  -ms-user-select: none;\\n  -moz-user-select: none;\\n  -webkit-user-select: none;\\n  user-select: none;\\n}\";",
-      "type": "blob"
-    },
-    "lib/threesome": {
-      "path": "lib/threesome",
-      "content": "(function() {\n  var Engine, Stats, bindWindowEvents, initCamera, initFloor, initScene, initStats;\n\n  Engine = require(\"./engine\");\n\n  Stats = require(\"stats\");\n\n  initCamera = function() {\n    var aspectRatio, camera;\n    aspectRatio = window.innerWidth / window.innerHeight;\n    camera = new THREE.PerspectiveCamera(45, aspectRatio, 1, 2000);\n    camera.position.set(0, 100, 200);\n    return camera;\n  };\n\n  initScene = function() {\n    var lights, scene;\n    lights = require(\"./lights\");\n    scene = new THREE.Scene();\n    scene.add(lights.ambient());\n    scene.add(lights.directional());\n    return scene;\n  };\n\n  initFloor = function(scene) {\n    var Cube;\n    Cube = require(\"./cube\");\n    return [0, 1, 2, 3, 4, 5, 6, 7, 8, 9].forEach(function(x) {\n      return [0, 1, 2, 3, 4, 5, 6, 7, 8, 9].forEach(function(z) {\n        return scene.add(Cube(x, z));\n      });\n    });\n  };\n\n  bindWindowEvents = function(camera, renderer) {\n    var resize;\n    resize = function() {\n      renderer.setSize(window.innerWidth, window.innerHeight);\n      camera.aspect = window.innerWidth / window.innerHeight;\n      return camera.updateProjectionMatrix();\n    };\n    $(window).resize(resize);\n    return resize();\n  };\n\n  initStats = function() {\n    var renderStats, updateStats;\n    updateStats = new Stats;\n    updateStats.setMode(1);\n    renderStats = new Stats;\n    renderStats.setMode(1);\n    updateStats.domElement.style.position = 'absolute';\n    updateStats.domElement.style.left = '0px';\n    updateStats.domElement.style.top = '0px';\n    document.body.appendChild(updateStats.domElement);\n    renderStats.domElement.style.position = 'absolute';\n    renderStats.domElement.style.right = '0px';\n    renderStats.domElement.style.top = '0px';\n    document.body.appendChild(renderStats.domElement);\n    return [updateStats, renderStats];\n  };\n\n  module.exports = {\n    init: function(data, update) {\n      var camera, engine, renderStats, renderer, scene, updateStats, _ref;\n      if (data == null) {\n        data = {};\n      }\n      _ref = initStats(), updateStats = _ref[0], renderStats = _ref[1];\n      camera = initCamera();\n      scene = initScene();\n      initFloor(scene);\n      renderer = new THREE.WebGLRenderer();\n      bindWindowEvents(camera, renderer);\n      document.body.appendChild(renderer.domElement);\n      engine = Engine(data.engine, {\n        update: function(t, dt) {\n          updateStats.begin();\n          update(scene, t, dt);\n          return updateStats.end();\n        },\n        render: function(t, dt) {\n          camera.lookAt(scene.position);\n          renderStats.begin();\n          renderer.render(scene, camera);\n          return renderStats.end();\n        }\n      });\n      return engine.start();\n    }\n  };\n\n}).call(this);\n",
-      "type": "blob"
-    },
-    "lib/lights": {
-      "path": "lib/lights",
-      "content": "(function() {\n  exports.ambient = function() {\n    return new THREE.AmbientLight(0x101030);\n  };\n\n  exports.directional = function() {\n    var directionalLight;\n    directionalLight = new THREE.DirectionalLight(0xffeedd);\n    directionalLight.position.set(0, 0, 10);\n    return directionalLight;\n  };\n\n}).call(this);\n",
-      "type": "blob"
-    },
-    "lib/cube": {
-      "path": "lib/cube",
-      "content": "(function() {\n  var CUBE_SIZE, geometry, material;\n\n  CUBE_SIZE = 10;\n\n  geometry = new THREE.BoxGeometry(CUBE_SIZE, CUBE_SIZE, CUBE_SIZE);\n\n  material = new THREE.MeshBasicMaterial({\n    color: 0xffffff,\n    wireframe: true\n  });\n\n  module.exports = function(x, z) {\n    var cube, mesh;\n    cube = new THREE.Object3D();\n    cube.position.set(x * CUBE_SIZE, -CUBE_SIZE / 2, z * CUBE_SIZE);\n    mesh = new THREE.Mesh(geometry, material);\n    cube.add(mesh);\n    return cube;\n  };\n\n}).call(this);\n",
-      "type": "blob"
-    },
-    "test/key_values": {
-      "path": "test/key_values",
-      "content": "(function() {\n  describe(\"keyValues\", function() {\n    return it(\"should iterate keys and values of an object\", function(done) {\n      var o;\n      o = {\n        test: \"value\"\n      };\n      return keyValues(o, function(key, value) {\n        assert.equal(key, \"test\");\n        assert.equal(value, \"value\");\n        return done();\n      });\n    });\n  });\n\n}).call(this);\n",
+    "raypicker": {
+      "path": "raypicker",
+      "content": "(function() {\n  var mouseEventToVector, pick, raycaster;\n\n  raycaster = new THREE.Raycaster();\n\n  mouseEventToVector = function(event) {\n    var vector;\n    vector = new THREE.Vector3();\n    vector.set((event.clientX / window.innerWidth) * 2 - 1, -(event.clientY / window.innerHeight) * 2 + 1, 0.5);\n    return vector;\n  };\n\n  pick = function(vector, objects, camera) {\n    var intersects;\n    vector.unproject(camera);\n    raycaster.ray.set(camera.position, vector.sub(camera.position).normalize());\n    return intersects = raycaster.intersectObjects(objects);\n  };\n\n  module.exports = function(objects, camera) {\n    return function(event) {\n      var vector;\n      event.preventDefault();\n      vector = mouseEventToVector(event);\n      return pick(vector, objects, camera);\n    };\n  };\n\n}).call(this);\n",
       "type": "blob"
     }
   },
