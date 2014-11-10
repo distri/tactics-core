@@ -62,7 +62,7 @@ Three JS Starter Kit
     module.exports =
       init: (data={}, update) ->
         [updateStats, renderStats] = initStats()
-    
+
         camera = initCamera()
         scene = initScene()
 
@@ -88,3 +88,10 @@ Three JS Starter Kit
             renderStats.end()
 
         engine.start()
+
+      click: (event) ->
+        x = (event.clientX / window.innerWidth) * 2 – 1
+        y = –(event_info.clientY / window.innerHeight) * 2 + 1
+        
+        mouse = new THREE.Vector3(x, y, 1)
+        
