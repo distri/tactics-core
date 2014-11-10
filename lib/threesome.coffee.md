@@ -90,8 +90,7 @@ Three JS Starter Kit
         engine.start()
 
       click: (event) ->
-        x = (event.clientX / window.innerWidth) * 2 – 1
-        y = –(event_info.clientY / window.innerHeight) * 2 + 1
-        
+        x = (event.clientX / window.innerWidth) * 2 - 1
+        y = -(event_info.clientY / window.innerHeight) * 2 + 1
+
         mouse = new THREE.Vector3(x, y, 1)
-        
