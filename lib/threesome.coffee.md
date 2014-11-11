@@ -66,7 +66,10 @@ Three JS Starter Kit
         scene.children
 
       renderer.domElement.onclick = Raypicker camera, objectsFn, (results) ->
-        console.log results
+        if results[0]
+          {object} = results[0]
+
+          object.material.color.setRGB rand(), rand(), rand()
 
     module.exports =
       init: (data={}, update) ->
