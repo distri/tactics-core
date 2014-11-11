@@ -99,7 +99,10 @@ Raypicker = require <span class="string">"./raypicker"</span>
     scene.children
 
   renderer.domElement.onclick = Raypicker camera, objectsFn, (results) -&gt;
-    console.log results
+    <span class="keyword">if</span> results[<span class="number">0</span>]
+      {object} = results[<span class="number">0</span>]
+
+      object.material.color.setRGB rand(), rand(), rand()
 
 module.exports =
   init: (data={}, update) -&gt;
