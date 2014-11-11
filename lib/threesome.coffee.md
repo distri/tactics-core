@@ -3,6 +3,7 @@ Three JS Starter Kit
 
     Engine = require "./engine"
     Stats = require "stats"
+    Raypicker = require "./raypicker"
 
     initCamera = ->
       aspectRatio = window.innerWidth / window.innerHeight
@@ -59,6 +60,14 @@ Three JS Starter Kit
 
       return [updateStats, renderStats]
 
+    # TODO: Parameterize better for consuming caller
+    bindClickEvent = (scene, camera, renderer) ->
+      objectsFn = ->
+        scene.children
+
+      renderer.domElement.onclick = Raypicker camera, objectsFn, (results) ->
+        console.log results
+
     module.exports =
       init: (data={}, update) ->
         [updateStats, renderStats] = initStats()
@@ -66,11 +75,47 @@ Three JS Starter Kit
         camera = initCamera()
         scene = initScene()
 
+        # TODO: Remove debugging globals
+        global.scene = scene
+        global.camera = camera
+
+        global.addLine = (start, end, materialProperties) ->
+          materialProperties ?=
+            color: 0x0000ff
+
+          material = new THREE.LineBasicMaterial materialProperties
+
+          geometry = new THREE.Geometry()
+          geometry.vertices.push(start)
+          geometry.vertices.push(end)
+
+          line = new THREE.Line(geometry, material)
+          scene.add line
+        
+        addLine(
+          new THREE.Vector3(0, 0, 0)
+          new THREE.Vector3(100, 0, 0)
+          color: 0xff0000
+        )
+        
+        addLine(
+          new THREE.Vector3(0, 0, 0)
+          new THREE.Vector3(0, 100, 0)
+          color: 0x00ff00
+        )
+        
+        addLine(
+          new THREE.Vector3(0, 0, 0)
+          new THREE.Vector3(0, 0, 100)
+          color: 0x0000ff
+        )
+
         initFloor(scene)
 
         renderer = new THREE.WebGLRenderer()
 
         bindWindowEvents(camera, renderer)
+        bindClickEvent(scene, camera, renderer)
         document.body.appendChild renderer.domElement
 
         engine = Engine data.engine,

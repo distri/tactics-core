@@ -9,10 +9,7 @@ Cube
       wireframe: true
 
     module.exports = (x, z) ->
-      cube = new THREE.Object3D()
+      cube = new THREE.Mesh geometry, material
       cube.position.set(x * CUBE_SIZE, -CUBE_SIZE/2, z * CUBE_SIZE)
-
-      mesh = new THREE.Mesh geometry, material
-      cube.add(mesh)
 
       return cube

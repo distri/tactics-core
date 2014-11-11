@@ -15,3 +15,6 @@ Data structures that make up the core of Tactis Game.
         applyStylesheet require("./style")
 
         Threesome.init(data, update)
+
+    if PACKAGE.name is "ROOT"
+      module.exports.init({}, ->)
