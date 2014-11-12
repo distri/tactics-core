@@ -93,16 +93,50 @@ Raypicker = require <span class="string">"./raypicker"</span>
 
   <span class="keyword">return</span> [updateStats, renderStats]
 
+<span class="function"><span class="title">objectsFn</span></span> = -&gt;
+  scene.children
+
+<span class="function"><span class="title">clickHandler</span></span> = (results) -&gt;
+  <span class="keyword">if</span> results[<span class="number">0</span>]
+    {object} = results[<span class="number">0</span>]
+
+    object.material.color.setRGB rand(), rand(), rand()
+
 <span class="comment"># TODO: Parameterize better for consuming caller</span>
 <span class="function"><span class="title">bindClickEvent</span></span> = (scene, camera, renderer) -&gt;
-  <span class="function"><span class="title">objectsFn</span></span> = -&gt;
-    scene.children
+  renderer.domElement.onclick = Raypicker camera, objectsFn, clickHandler
 
-  renderer.domElement.onclick = Raypicker camera, objectsFn, (results) -&gt;
-    <span class="keyword">if</span> results[<span class="number">0</span>]
-      {object} = results[<span class="number">0</span>]
+<span class="function"><span class="title">debuggingLines</span></span> = (scene) -&gt;
+  <span class="function"><span class="title">addLine</span></span> = (start, end, materialProperties) -&gt;
+    materialProperties ?=
+      color: <span class="number">0x0000ff</span>
 
-      object.material.color.setRGB rand(), rand(), rand()
+    material = <span class="keyword">new</span> THREE.LineBasicMaterial materialProperties
+
+    geometry = <span class="keyword">new</span> THREE.Geometry()
+    geometry.vertices.push(start)
+    geometry.vertices.push(end)
+
+    line = <span class="keyword">new</span> THREE.Line(geometry, material)
+    scene.add line
+
+  addLine(
+    <span class="keyword">new</span> THREE.Vector3(<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>)
+    <span class="keyword">new</span> THREE.Vector3(<span class="number">100</span>, <span class="number">0</span>, <span class="number">0</span>)
+    color: <span class="number">0xff0000</span>
+  )
+
+  addLine(
+    <span class="keyword">new</span> THREE.Vector3(<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>)
+    <span class="keyword">new</span> THREE.Vector3(<span class="number">0</span>, <span class="number">100</span>, <span class="number">0</span>)
+    color: <span class="number">0x00ff00</span>
+  )
+
+  addLine(
+    <span class="keyword">new</span> THREE.Vector3(<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>)
+    <span class="keyword">new</span> THREE.Vector3(<span class="number">0</span>, <span class="number">0</span>, <span class="number">100</span>)
+    color: <span class="number">0x0000ff</span>
+  )
 
 module.exports =
   init: (data={}, update) -&gt;
@@ -115,38 +149,8 @@ module.exports =
     global.scene = scene
     global.camera = camera
 
-    global.<span class="function"><span class="title">addLine</span></span> = (start, end, materialProperties) -&gt;
-      materialProperties ?=
-        color: <span class="number">0x0000ff</span>
-
-      material = <span class="keyword">new</span> THREE.LineBasicMaterial materialProperties
-
-      geometry = <span class="keyword">new</span> THREE.Geometry()
-      geometry.vertices.push(start)
-      geometry.vertices.push(end)
-
-      line = <span class="keyword">new</span> THREE.Line(geometry, material)
-      scene.add line
-
-    addLine(
-      <span class="keyword">new</span> THREE.Vector3(<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>)
-      <span class="keyword">new</span> THREE.Vector3(<span class="number">100</span>, <span class="number">0</span>, <span class="number">0</span>)
-      color: <span class="number">0xff0000</span>
-    )
-
-    addLine(
-      <span class="keyword">new</span> THREE.Vector3(<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>)
-      <span class="keyword">new</span> THREE.Vector3(<span class="number">0</span>, <span class="number">100</span>, <span class="number">0</span>)
-      color: <span class="number">0x00ff00</span>
-    )
-
-    addLine(
-      <span class="keyword">new</span> THREE.Vector3(<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>)
-      <span class="keyword">new</span> THREE.Vector3(<span class="number">0</span>, <span class="number">0</span>, <span class="number">100</span>)
-      color: <span class="number">0x0000ff</span>
-    )
-
     initFloor(scene)
+    debuggingLines(scene)
 
     renderer = <span class="keyword">new</span> THREE.WebGLRenderer()
 
@@ -170,11 +174,9 @@ module.exports =
 
     engine.start()
 
-  click: (event) -&gt;
-    x = (event.clientX / window.innerWidth) * <span class="number">2</span> - <span class="number">1</span>
-    y = -(event_info.clientY / window.innerHeight) * <span class="number">2</span> + <span class="number">1</span>
-
-    mouse = <span class="keyword">new</span> THREE.Vector3(x, y, <span class="number">1</span>)</code></pre>
+  setClickHandling: (_objectsFn, _clickHandler) -&gt;
+    objectsFn = _objectsFn
+    clickHandler = _clickHandler</code></pre>
 </div>
         </li>
         
