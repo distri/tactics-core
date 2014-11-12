@@ -60,16 +60,50 @@ Three JS Starter Kit
 
       return [updateStats, renderStats]
 
+    objectsFn = ->
+      scene.children
+
+    clickHandler = (results) ->
+      if results[0]
+        {object} = results[0]
+
+        object.material.color.setRGB rand(), rand(), rand()
+
     # TODO: Parameterize better for consuming caller
     bindClickEvent = (scene, camera, renderer) ->
-      objectsFn = ->
-        scene.children
+      renderer.domElement.onclick = Raypicker camera, objectsFn, clickHandler
 
-      renderer.domElement.onclick = Raypicker camera, objectsFn, (results) ->
-        if results[0]
-          {object} = results[0]
+    debuggingLines = (scene) ->
+      addLine = (start, end, materialProperties) ->
+        materialProperties ?=
+          color: 0x0000ff
 
-          object.material.color.setRGB rand(), rand(), rand()
+        material = new THREE.LineBasicMaterial materialProperties
+
+        geometry = new THREE.Geometry()
+        geometry.vertices.push(start)
+        geometry.vertices.push(end)
+
+        line = new THREE.Line(geometry, material)
+        scene.add line
+
+      addLine(
+        new THREE.Vector3(0, 0, 0)
+        new THREE.Vector3(100, 0, 0)
+        color: 0xff0000
+      )
+
+      addLine(
+        new THREE.Vector3(0, 0, 0)
+        new THREE.Vector3(0, 100, 0)
+        color: 0x00ff00
+      )
+
+      addLine(
+        new THREE.Vector3(0, 0, 0)
+        new THREE.Vector3(0, 0, 100)
+        color: 0x0000ff
+      )
 
     module.exports =
       init: (data={}, update) ->
@@ -82,38 +116,8 @@ Three JS Starter Kit
         global.scene = scene
         global.camera = camera
 
-        global.addLine = (start, end, materialProperties) ->
-          materialProperties ?=
-            color: 0x0000ff
-
-          material = new THREE.LineBasicMaterial materialProperties
-
-          geometry = new THREE.Geometry()
-          geometry.vertices.push(start)
-          geometry.vertices.push(end)
-
-          line = new THREE.Line(geometry, material)
-          scene.add line
-        
-        addLine(
-          new THREE.Vector3(0, 0, 0)
-          new THREE.Vector3(100, 0, 0)
-          color: 0xff0000
-        )
-        
-        addLine(
-          new THREE.Vector3(0, 0, 0)
-          new THREE.Vector3(0, 100, 0)
-          color: 0x00ff00
-        )
-        
-        addLine(
-          new THREE.Vector3(0, 0, 0)
-          new THREE.Vector3(0, 0, 100)
-          color: 0x0000ff
-        )
-
         initFloor(scene)
+        debuggingLines(scene)
 
         renderer = new THREE.WebGLRenderer()
 
@@ -137,8 +141,6 @@ Three JS Starter Kit
 
         engine.start()
 
-      click: (event) ->
-        x = (event.clientX / window.innerWidth) * 2 - 1
-        y = -(event_info.clientY / window.innerHeight) * 2 + 1
-
-        mouse = new THREE.Vector3(x, y, 1)
+      setClickHandling: (_objectsFn, _clickHandler) ->
+        objectsFn = _objectsFn
+        clickHandler = _clickHandler

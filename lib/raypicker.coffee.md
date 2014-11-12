@@ -19,9 +19,9 @@ Select an object using raycasting in THREE.js
       y = y - top
 
       vector = new THREE.Vector3()
-      vector.set( 
-        ( x / width ) * 2 - 1, 
-        - ( y / height ) * 2 + 1, 
+      vector.set(
+        ( x / width ) * 2 - 1,
+        - ( y / height ) * 2 + 1,
         0
       )
 
