@@ -67,6 +67,7 @@ require <span class="string">"./occulus_rift_effect"</span>
 <span class="function"><span class="title">bindWindowEvents</span></span> = (camera, renderer) -&gt;
   <span class="function"><span class="title">resize</span></span> = -&gt;
     renderer.setSize window.innerWidth, window.innerHeight
+    <span class="comment"># TODO: Probably need to resize effect in here too...</span>
 
     camera.aspect = window.innerWidth / window.innerHeight
     camera.updateProjectionMatrix()
@@ -152,7 +153,7 @@ module.<span class="function"><span class="title">exports</span></span> = (optio
 
   document.body.appendChild renderer.domElement
 
-  <span class="keyword">if</span> <span class="literal">true</span> <span class="comment"># Occulus Rift</span>
+  <span class="keyword">if</span> <span class="literal">false</span> <span class="comment"># Occulus Rift</span>
     effect = <span class="keyword">new</span> THREE.OculusRiftEffect( renderer, { worldScale: <span class="number">1</span> } )</code></pre>
 </div>
         </li>
