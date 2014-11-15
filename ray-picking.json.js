@@ -110,7 +110,7 @@ window["distri/tactics-core:ray-picking"]({
     },
     "test/main.coffee": {
       "path": "test/main.coffee",
-      "content": "Main = require \"../main\"\n\ndescribe \"main\", ->\n  it \"should expose Character\", ->\n    assert Main.Character\n\n  it \"should init\", ->\n    assert Main.init\n      data: {}\n      update: ->\n",
+      "content": "Main = require \"../main\"\n\ndescribe \"main\", ->\n  it \"should expose Character\", ->\n    assert Main.Character\n",
       "mode": "100644",
       "type": "blob"
     },
@@ -204,7 +204,7 @@ window["distri/tactics-core:ray-picking"]({
     },
     "test/main": {
       "path": "test/main",
-      "content": "(function() {\n  var Main;\n\n  Main = require(\"../main\");\n\n  describe(\"main\", function() {\n    it(\"should expose Character\", function() {\n      return assert(Main.Character);\n    });\n    return it(\"should init\", function() {\n      return assert(Main.init({\n        data: {},\n        update: function() {}\n      }));\n    });\n  });\n\n}).call(this);\n",
+      "content": "(function() {\n  var Main;\n\n  Main = require(\"../main\");\n\n  describe(\"main\", function() {\n    return it(\"should expose Character\", function() {\n      return assert(Main.Character);\n    });\n  });\n\n}).call(this);\n",
       "type": "blob"
     },
     "test/names": {
