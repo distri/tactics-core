@@ -93,17 +93,7 @@ Raypicker = require <span class="string">"./raypicker"</span>
 
   <span class="keyword">return</span> [updateStats, renderStats]
 
-<span class="function"><span class="title">objectsFn</span></span> = -&gt;
-  scene.children
-
-<span class="function"><span class="title">clickHandler</span></span> = (results) -&gt;
-  <span class="keyword">if</span> results[<span class="number">0</span>]
-    {object} = results[<span class="number">0</span>]
-
-    object.material.color.setRGB rand(), rand(), rand()
-
-<span class="comment"># TODO: Parameterize better for consuming caller</span>
-<span class="function"><span class="title">bindClickEvent</span></span> = (scene, camera, renderer) -&gt;
+<span class="function"><span class="title">bindClickEvent</span></span> = (camera, renderer, clickHandler, objectsFn) -&gt;
   renderer.domElement.onclick = Raypicker camera, objectsFn, clickHandler
 
 <span class="function"><span class="title">debuggingLines</span></span> = (scene) -&gt;
@@ -138,45 +128,43 @@ Raypicker = require <span class="string">"./raypicker"</span>
     color: <span class="number">0x0000ff</span>
   )
 
-module.exports =
-  init: (data={}, update) -&gt;
-    [updateStats, renderStats] = initStats()
+module.<span class="function"><span class="title">exports</span></span> = (options={}) -&gt;
+  {data, update, click, clickObjectsFn} = options
 
-    camera = initCamera()
-    scene = initScene()
+  click ?= -&gt;
+  clickObjectsFn ?= -&gt;
+    scene.children
 
-    <span class="comment"># TODO: Remove debugging globals</span>
-    global.scene = scene
-    global.camera = camera
+  [updateStats, renderStats] = initStats()
 
-    initFloor(scene)
-    debuggingLines(scene)
+  camera = initCamera()
+  scene = initScene()
 
-    renderer = <span class="keyword">new</span> THREE.WebGLRenderer()
+  initFloor(scene)
+  debuggingLines(scene)
 
-    bindWindowEvents(camera, renderer)
-    bindClickEvent(scene, camera, renderer)
-    document.body.appendChild renderer.domElement
+  renderer = <span class="keyword">new</span> THREE.WebGLRenderer()
 
-    engine = Engine data.engine,
-      update: (t, dt) -&gt;
-        <span class="comment"># Update the scene objects!</span>
-        updateStats.begin()
-        update(scene, t, dt)
-        updateStats.end()
+  bindWindowEvents(camera, renderer)
+  bindClickEvent camera, renderer, click, clickObjectsFn
 
-      render: (t, dt) -&gt;
-        camera.lookAt scene.position
+  document.body.appendChild renderer.domElement
 
-        renderStats.begin()
-        renderer.render scene, camera
-        renderStats.end()
+  engine = Engine data.engine,
+    update: (t, dt) -&gt;
+      <span class="comment"># Update the scene objects!</span>
+      updateStats.begin()
+      update(scene, t, dt)
+      updateStats.end()
 
-    engine.start()
+    render: (t, dt) -&gt;
+      camera.lookAt scene.position
 
-  setClickHandling: (_objectsFn, _clickHandler) -&gt;
-    objectsFn = _objectsFn
-    clickHandler = _clickHandler</code></pre>
+      renderStats.begin()
+      renderer.render scene, camera
+      renderStats.end()
+
+  engine.start()</code></pre>
 </div>
         </li>
         

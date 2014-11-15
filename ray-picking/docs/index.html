@@ -43,13 +43,21 @@ module.exports =
   Character: require <span class="string">"./character"</span>
   Name: require <span class="string">"./names"</span>
   Loader: require <span class="string">"./data_loader"</span>
-  init: (data, update) -&gt;
-    applyStylesheet require(<span class="string">"./style"</span>)
+  init: (options={}) -&gt;
+    applyStylesheet require(<span class="string">"./style"</span>, <span class="string">"tactics-core"</span>)
 
-    Threesome.init(data, update)
+    Threesome(options)
 
 <span class="keyword">if</span> PACKAGE.name <span class="keyword">is</span> <span class="string">"ROOT"</span>
-  module.exports.init({}, -&gt;)</code></pre>
+  module.exports.init
+    data: {}
+    update: -&gt;
+
+    click: (results) -&gt;
+      <span class="keyword">if</span> results[<span class="number">0</span>]
+        {object} = results[<span class="number">0</span>]
+
+        object.material.color.setRGB rand(), rand(), rand()</code></pre>
 </div>
         </li>
         
