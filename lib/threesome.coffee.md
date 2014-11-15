@@ -5,6 +5,8 @@ Three JS Starter Kit
     Stats = require "stats"
     Raypicker = require "./raypicker"
 
+    require "./occulus_rift_effect"
+
     initCamera = ->
       aspectRatio = window.innerWidth / window.innerHeight
 
@@ -116,6 +118,12 @@ Three JS Starter Kit
       bindClickEvent camera, renderer, click, clickObjectsFn
 
       document.body.appendChild renderer.domElement
+      
+      if true # Occulus Rift
+        effect = new THREE.OculusRiftEffect( renderer, { worldScale: 1 } )
+  			effect.setSize( window.innerWidth, window.innerHeight )
+      else
+        effect = renderer
 
       engine = Engine data.engine,
         update: (t, dt) ->
@@ -128,7 +136,7 @@ Three JS Starter Kit
           camera.lookAt scene.position
 
           renderStats.begin()
-          renderer.render scene, camera
+          effect.render scene, camera
           renderStats.end()
 
       engine.start()
