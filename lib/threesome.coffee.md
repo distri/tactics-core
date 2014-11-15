@@ -60,17 +60,7 @@ Three JS Starter Kit
 
       return [updateStats, renderStats]
 
-    objectsFn = ->
-      scene.children
-
-    clickHandler = (results) ->
-      if results[0]
-        {object} = results[0]
-
-        object.material.color.setRGB rand(), rand(), rand()
-
-    # TODO: Parameterize better for consuming caller
-    bindClickEvent = (scene, camera, renderer) ->
+    bindClickEvent = (camera, renderer, clickHandler, objectsFn) ->
       renderer.domElement.onclick = Raypicker camera, objectsFn, clickHandler
 
     debuggingLines = (scene) ->
@@ -105,42 +95,40 @@ Three JS Starter Kit
         color: 0x0000ff
       )
 
-    module.exports =
-      init: (data={}, update) ->
-        [updateStats, renderStats] = initStats()
+    module.exports = (options={}) ->
+      {data, update, click, clickObjectsFn} = options
 
-        camera = initCamera()
-        scene = initScene()
+      click ?= ->
+      clickObjectsFn ?= ->
+        scene.children
 
-        # TODO: Remove debugging globals
-        global.scene = scene
-        global.camera = camera
+      [updateStats, renderStats] = initStats()
 
-        initFloor(scene)
-        debuggingLines(scene)
+      camera = initCamera()
+      scene = initScene()
 
-        renderer = new THREE.WebGLRenderer()
+      initFloor(scene)
+      debuggingLines(scene)
 
-        bindWindowEvents(camera, renderer)
-        bindClickEvent(scene, camera, renderer)
-        document.body.appendChild renderer.domElement
+      renderer = new THREE.WebGLRenderer()
 
-        engine = Engine data.engine,
-          update: (t, dt) ->
-            # Update the scene objects!
-            updateStats.begin()
-            update(scene, t, dt)
-            updateStats.end()
+      bindWindowEvents(camera, renderer)
+      bindClickEvent camera, renderer, click, clickObjectsFn
 
-          render: (t, dt) ->
-            camera.lookAt scene.position
+      document.body.appendChild renderer.domElement
 
-            renderStats.begin()
-            renderer.render scene, camera
-            renderStats.end()
+      engine = Engine data.engine,
+        update: (t, dt) ->
+          # Update the scene objects!
+          updateStats.begin()
+          update(scene, t, dt)
+          updateStats.end()
 
-        engine.start()
+        render: (t, dt) ->
+          camera.lookAt scene.position
 
-      setClickHandling: (_objectsFn, _clickHandler) ->
-        objectsFn = _objectsFn
-        clickHandler = _clickHandler
+          renderStats.begin()
+          renderer.render scene, camera
+          renderStats.end()
+
+      engine.start()

@@ -5,4 +5,6 @@ describe "main", ->
     assert Main.Character
 
   it "should init", ->
-    assert Main.init({}, ->)
+    assert Main.init
+      data: {}
+      update: ->
