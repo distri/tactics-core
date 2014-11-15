@@ -34,6 +34,7 @@ Three JS Starter Kit
     bindWindowEvents = (camera, renderer) ->
       resize = ->
         renderer.setSize window.innerWidth, window.innerHeight
+        # TODO: Probably need to resize effect in here too...
 
         camera.aspect = window.innerWidth / window.innerHeight
         camera.updateProjectionMatrix()
@@ -119,7 +120,7 @@ Three JS Starter Kit
 
       document.body.appendChild renderer.domElement
       
-      if true # Occulus Rift
+      if false # Occulus Rift
         effect = new THREE.OculusRiftEffect( renderer, { worldScale: 1 } )
   			effect.setSize( window.innerWidth, window.innerHeight )
       else
