@@ -34,7 +34,7 @@ Select an object using raycasting in THREE.js
 
       raycaster.set camera.position, vector
 
-      intersects = raycaster.intersectObjects(objects, false)
+      intersects = raycaster.intersectObjects(objects, true)
 
     module.exports = (camera, objectsFn, handler) ->
       (event) ->
