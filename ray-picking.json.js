@@ -62,7 +62,7 @@ window["distri/tactics-core:ray-picking"]({
     },
     "lib/raypicker.coffee.md": {
       "path": "lib/raypicker.coffee.md",
-      "content": "Raypicker\n=========\n\nSelect an object using raycasting in THREE.js\n\n    raycaster = new THREE.Raycaster()\n\n    mouseEventToVector = (event) ->\n      {clientX:x, clientY:y} = event\n\n      {\n        clientWidth:width\n        clientHeight:height\n        clientLeft:left\n        clientTop:top\n      } = event.currentTarget\n\n      x = x - left\n      y = y - top\n\n      vector = new THREE.Vector3()\n      vector.set(\n        ( x / width ) * 2 - 1,\n        - ( y / height ) * 2 + 1,\n        0\n      )\n\n      return vector\n\n    pick = (vector, objects, camera) ->\n      vector.unproject camera\n      vector.sub camera.position\n      vector.normalize()\n\n      raycaster.set camera.position, vector\n\n      intersects = raycaster.intersectObjects(objects, false)\n\n    module.exports = (camera, objectsFn, handler) ->\n      (event) ->\n        event.preventDefault()\n\n        vector = mouseEventToVector(event)\n\n        handler pick(vector, objectsFn(), camera)\n",
+      "content": "Raypicker\n=========\n\nSelect an object using raycasting in THREE.js\n\n    raycaster = new THREE.Raycaster()\n\n    mouseEventToVector = (event) ->\n      {clientX:x, clientY:y} = event\n\n      {\n        clientWidth:width\n        clientHeight:height\n        clientLeft:left\n        clientTop:top\n      } = event.currentTarget\n\n      x = x - left\n      y = y - top\n\n      vector = new THREE.Vector3()\n      vector.set(\n        ( x / width ) * 2 - 1,\n        - ( y / height ) * 2 + 1,\n        0\n      )\n\n      return vector\n\n    pick = (vector, objects, camera) ->\n      vector.unproject camera\n      vector.sub camera.position\n      vector.normalize()\n\n      raycaster.set camera.position, vector\n\n      intersects = raycaster.intersectObjects(objects, true)\n\n    module.exports = (camera, objectsFn, handler) ->\n      (event) ->\n        event.preventDefault()\n\n        vector = mouseEventToVector(event)\n\n        handler pick(vector, objectsFn(), camera)\n",
       "mode": "100644",
       "type": "blob"
     },
@@ -86,7 +86,7 @@ window["distri/tactics-core:ray-picking"]({
     },
     "pixie.cson": {
       "path": "pixie.cson",
-      "content": "version: \"0.2.3-pre.1\"\nentryPoint: \"main\"\nremoteDependencies: [\n  \"https://code.jquery.com/jquery-1.10.1.min.js\"\n  \"https://cdnjs.cloudflare.com/ajax/libs/three.js/r69/three.js\"\n]\ndependencies:\n  cornerstone: \"distri/cornerstone:v0.2.6\"\n  spreadsheet: \"distri/gdocs-spreadsheet:v0.1.0\"\n  stats: \"distri/stats.js:v0.11.0\"\n  util: \"distri/util:v0.1.1\"\n",
+      "content": "version: \"0.2.3-pre.2\"\nentryPoint: \"main\"\nremoteDependencies: [\n  \"https://code.jquery.com/jquery-1.10.1.min.js\"\n  \"https://cdnjs.cloudflare.com/ajax/libs/three.js/r69/three.js\"\n]\ndependencies:\n  cornerstone: \"distri/cornerstone:v0.2.6\"\n  spreadsheet: \"distri/gdocs-spreadsheet:v0.1.0\"\n  stats: \"distri/stats.js:v0.11.0\"\n  util: \"distri/util:v0.1.1\"\n",
       "mode": "100644",
       "type": "blob"
     },
@@ -176,7 +176,7 @@ window["distri/tactics-core:ray-picking"]({
     },
     "lib/raypicker": {
       "path": "lib/raypicker",
-      "content": "(function() {\n  var mouseEventToVector, pick, raycaster;\n\n  raycaster = new THREE.Raycaster();\n\n  mouseEventToVector = function(event) {\n    var height, left, top, vector, width, x, y, _ref;\n    x = event.clientX, y = event.clientY;\n    _ref = event.currentTarget, width = _ref.clientWidth, height = _ref.clientHeight, left = _ref.clientLeft, top = _ref.clientTop;\n    x = x - left;\n    y = y - top;\n    vector = new THREE.Vector3();\n    vector.set((x / width) * 2 - 1, -(y / height) * 2 + 1, 0);\n    return vector;\n  };\n\n  pick = function(vector, objects, camera) {\n    var intersects;\n    vector.unproject(camera);\n    vector.sub(camera.position);\n    vector.normalize();\n    raycaster.set(camera.position, vector);\n    return intersects = raycaster.intersectObjects(objects, false);\n  };\n\n  module.exports = function(camera, objectsFn, handler) {\n    return function(event) {\n      var vector;\n      event.preventDefault();\n      vector = mouseEventToVector(event);\n      return handler(pick(vector, objectsFn(), camera));\n    };\n  };\n\n}).call(this);\n",
+      "content": "(function() {\n  var mouseEventToVector, pick, raycaster;\n\n  raycaster = new THREE.Raycaster();\n\n  mouseEventToVector = function(event) {\n    var height, left, top, vector, width, x, y, _ref;\n    x = event.clientX, y = event.clientY;\n    _ref = event.currentTarget, width = _ref.clientWidth, height = _ref.clientHeight, left = _ref.clientLeft, top = _ref.clientTop;\n    x = x - left;\n    y = y - top;\n    vector = new THREE.Vector3();\n    vector.set((x / width) * 2 - 1, -(y / height) * 2 + 1, 0);\n    return vector;\n  };\n\n  pick = function(vector, objects, camera) {\n    var intersects;\n    vector.unproject(camera);\n    vector.sub(camera.position);\n    vector.normalize();\n    raycaster.set(camera.position, vector);\n    return intersects = raycaster.intersectObjects(objects, true);\n  };\n\n  module.exports = function(camera, objectsFn, handler) {\n    return function(event) {\n      var vector;\n      event.preventDefault();\n      vector = mouseEventToVector(event);\n      return handler(pick(vector, objectsFn(), camera));\n    };\n  };\n\n}).call(this);\n",
       "type": "blob"
     },
     "lib/threesome": {
@@ -196,7 +196,7 @@ window["distri/tactics-core:ray-picking"]({
     },
     "pixie": {
       "path": "pixie",
-      "content": "module.exports = {\"version\":\"0.2.3-pre.1\",\"entryPoint\":\"main\",\"remoteDependencies\":[\"https://code.jquery.com/jquery-1.10.1.min.js\",\"https://cdnjs.cloudflare.com/ajax/libs/three.js/r69/three.js\"],\"dependencies\":{\"cornerstone\":\"distri/cornerstone:v0.2.6\",\"spreadsheet\":\"distri/gdocs-spreadsheet:v0.1.0\",\"stats\":\"distri/stats.js:v0.11.0\",\"util\":\"distri/util:v0.1.1\"}};",
+      "content": "module.exports = {\"version\":\"0.2.3-pre.2\",\"entryPoint\":\"main\",\"remoteDependencies\":[\"https://code.jquery.com/jquery-1.10.1.min.js\",\"https://cdnjs.cloudflare.com/ajax/libs/three.js/r69/three.js\"],\"dependencies\":{\"cornerstone\":\"distri/cornerstone:v0.2.6\",\"spreadsheet\":\"distri/gdocs-spreadsheet:v0.1.0\",\"stats\":\"distri/stats.js:v0.11.0\",\"util\":\"distri/util:v0.1.1\"}};",
       "type": "blob"
     },
     "style": {
@@ -238,7 +238,7 @@ window["distri/tactics-core:ray-picking"]({
   "progenitor": {
     "url": "http://www.danielx.net/editor/"
   },
-  "version": "0.2.3-pre.1",
+  "version": "0.2.3-pre.2",
   "entryPoint": "main",
   "remoteDependencies": [
     "https://code.jquery.com/jquery-1.10.1.min.js",
