@@ -119,10 +119,10 @@ Three JS Starter Kit
       bindClickEvent camera, renderer, click, clickObjectsFn
 
       document.body.appendChild renderer.domElement
-      
-      if false # Occulus Rift
-        effect = new THREE.OculusRiftEffect( renderer, { worldScale: 1 } )
-  			effect.setSize( window.innerWidth, window.innerHeight )
+
+      if options.occulus # Occulus Rift
+        effect = new THREE.OculusRiftEffect(renderer, { worldScale: 1 })
+        effect.setSize( window.innerWidth, window.innerHeight )
       else
         effect = renderer
 
