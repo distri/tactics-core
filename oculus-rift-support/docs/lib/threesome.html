@@ -143,6 +143,8 @@ module.<span class="function"><span class="title">exports</span></span> = (optio
   camera = initCamera()
   scene = initScene()
 
+  camera.lookAt scene.position
+
   initFloor(scene)
   debuggingLines(scene)
 
@@ -151,6 +153,8 @@ module.<span class="function"><span class="title">exports</span></span> = (optio
   <span class="keyword">if</span> options.oculus <span class="comment"># Oculus Rift</span>
     effect = <span class="keyword">new</span> THREE.OculusRiftEffect(renderer, { worldScale: <span class="number">1</span> })
     effect.setSize( window.innerWidth, window.innerHeight )
+
+    require(<span class="string">"./oculus_rift/camera_control"</span>)(camera)
   <span class="keyword">else</span>
     effect = renderer
 
@@ -167,8 +171,6 @@ module.<span class="function"><span class="title">exports</span></span> = (optio
       updateStats.end()
 
     render: (t, dt) -&gt;
-      camera.lookAt scene.position
-
       renderStats.begin()
       effect.render scene, camera
       renderStats.end()
