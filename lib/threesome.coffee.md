@@ -110,6 +110,8 @@ Three JS Starter Kit
       camera = initCamera()
       scene = initScene()
 
+      camera.lookAt scene.position
+
       initFloor(scene)
       debuggingLines(scene)
 
@@ -118,6 +120,8 @@ Three JS Starter Kit
       if options.oculus # Oculus Rift
         effect = new THREE.OculusRiftEffect(renderer, { worldScale: 1 })
         effect.setSize( window.innerWidth, window.innerHeight )
+
+        require("./oculus_rift/camera_control")(camera)
       else
         effect = renderer
 
@@ -134,8 +138,6 @@ Three JS Starter Kit
           updateStats.end()
 
         render: (t, dt) ->
-          camera.lookAt scene.position
-
           renderStats.begin()
           effect.render scene, camera
           renderStats.end()
