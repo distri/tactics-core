@@ -4,15 +4,14 @@ Cube
     CUBE_SIZE = 10
 
     geometry = new THREE.BoxGeometry(CUBE_SIZE, CUBE_SIZE, CUBE_SIZE)
-    material = new THREE.MeshBasicMaterial
-      color: 0xffffff
-      wireframe: true
 
     module.exports = (x, z) ->
-      cube = new THREE.Object3D()
-      cube.position.set(x * CUBE_SIZE, -CUBE_SIZE/2, z * CUBE_SIZE)
+      material = new THREE.MeshBasicMaterial
 
-      mesh = new THREE.Mesh geometry, material
-      cube.add(mesh)
+      grayness = rand() * 0.5 + 0.25
+      material.color.setRGB grayness, grayness, grayness
+
+      cube = new THREE.Mesh geometry, material
+      cube.position.set(x * CUBE_SIZE, -CUBE_SIZE/2, z * CUBE_SIZE)
 
       return cube

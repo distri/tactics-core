@@ -3,6 +3,9 @@ Three JS Starter Kit
 
     Engine = require "./engine"
     Stats = require "stats"
+    Raypicker = require "./raypicker"
+
+    require "./occulus_rift_effect"
 
     initCamera = ->
       aspectRatio = window.innerWidth / window.innerHeight
@@ -31,6 +34,7 @@ Three JS Starter Kit
     bindWindowEvents = (camera, renderer) ->
       resize = ->
         renderer.setSize window.innerWidth, window.innerHeight
+        # TODO: Probably need to resize effect in here too...
 
         camera.aspect = window.innerWidth / window.innerHeight
         camera.updateProjectionMatrix()
@@ -59,38 +63,81 @@ Three JS Starter Kit
 
       return [updateStats, renderStats]
 
-    module.exports =
-      init: (data={}, update) ->
-        [updateStats, renderStats] = initStats()
+    bindClickEvent = (camera, renderer, clickHandler, objectsFn) ->
+      renderer.domElement.onclick = Raypicker camera, objectsFn, clickHandler
 
-        camera = initCamera()
-        scene = initScene()
+    debuggingLines = (scene) ->
+      addLine = (start, end, materialProperties) ->
+        materialProperties ?=
+          color: 0x0000ff
 
-        initFloor(scene)
+        material = new THREE.LineBasicMaterial materialProperties
 
-        renderer = new THREE.WebGLRenderer()
+        geometry = new THREE.Geometry()
+        geometry.vertices.push(start)
+        geometry.vertices.push(end)
 
-        bindWindowEvents(camera, renderer)
-        document.body.appendChild renderer.domElement
+        line = new THREE.Line(geometry, material)
+        scene.add line
 
-        engine = Engine data.engine,
-          update: (t, dt) ->
-            # Update the scene objects!
-            updateStats.begin()
-            update(scene, t, dt)
-            updateStats.end()
+      addLine(
+        new THREE.Vector3(0, 0, 0)
+        new THREE.Vector3(100, 0, 0)
+        color: 0xff0000
+      )
 
-          render: (t, dt) ->
-            camera.lookAt scene.position
+      addLine(
+        new THREE.Vector3(0, 0, 0)
+        new THREE.Vector3(0, 100, 0)
+        color: 0x00ff00
+      )
 
-            renderStats.begin()
-            renderer.render scene, camera
-            renderStats.end()
+      addLine(
+        new THREE.Vector3(0, 0, 0)
+        new THREE.Vector3(0, 0, 100)
+        color: 0x0000ff
+      )
 
-        engine.start()
+    module.exports = (options={}) ->
+      {data, update, click, clickObjectsFn} = options
 
-      click: (event) ->
-        x = (event.clientX / window.innerWidth) * 2 - 1
-        y = -(event_info.clientY / window.innerHeight) * 2 + 1
+      click ?= ->
+      clickObjectsFn ?= ->
+        scene.children
 
-        mouse = new THREE.Vector3(x, y, 1)
+      [updateStats, renderStats] = initStats()
+
+      camera = initCamera()
+      scene = initScene()
+
+      initFloor(scene)
+      debuggingLines(scene)
+
+      renderer = new THREE.WebGLRenderer()
+
+      bindWindowEvents(camera, renderer)
+      bindClickEvent camera, renderer, click, clickObjectsFn
+
+      document.body.appendChild renderer.domElement
+
+      if options.occulus # Occulus Rift
+        effect = new THREE.OculusRiftEffect(renderer, { worldScale: 1 })
+        effect.setSize( window.innerWidth, window.innerHeight )
+      else
+        effect = renderer
+
+      engine = Engine data.engine,
+        update: (t, dt) ->
+          # Update the scene objects!
+          updateStats.begin()
+          update(scene, t, dt)
+          updateStats.end()
+
+        render: (t, dt) ->
+          camera.lookAt scene.position
+
+          renderStats.begin()
+          effect.render scene, camera
+          renderStats.end()
+
+      engine.start()
