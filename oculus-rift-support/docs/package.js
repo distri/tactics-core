@@ -300,7 +300,7 @@
     },
     "lib/oculus_rift/camera_control.coffee": {
       "path": "lib/oculus_rift/camera_control.coffee",
-      "content": "\nmodule.exports = (camera) ->\n  setInterval ->\n    $.getJSON(\"http://localhost:3000/orientation\").then ({roll, pitch, yaw}) ->\n      # euler = new THREE.Euler(roll, pitch, yaw)\n\n      camera.rotation.x = pitch\n      camera.rotation.y = yaw\n      camera.rotation.z = roll\n  , 1\n",
+      "content": "\nmodule.exports = (camera) ->\n  # TODO: Switch to websockets or something a little better that ajaxin\n  setInterval ->\n    $.getJSON(\"http://localhost:3000/orientation\").then ({pitch, yaw, roll}) ->\n      camera.rotation.x = pitch\n      camera.rotation.y = yaw\n      camera.rotation.z = roll\n  , 1\n",
       "mode": "100644"
     }
   },
@@ -407,7 +407,7 @@
     },
     "lib/oculus_rift/camera_control": {
       "path": "lib/oculus_rift/camera_control",
-      "content": "(function() {\n  module.exports = function(camera) {\n    return setInterval(function() {\n      return $.getJSON(\"http://localhost:3000/orientation\").then(function(_arg) {\n        var pitch, roll, yaw;\n        roll = _arg.roll, pitch = _arg.pitch, yaw = _arg.yaw;\n        camera.rotation.x = pitch;\n        camera.rotation.y = yaw;\n        return camera.rotation.z = roll;\n      });\n    }, 1);\n  };\n\n}).call(this);\n",
+      "content": "(function() {\n  module.exports = function(camera) {\n    return setInterval(function() {\n      return $.getJSON(\"http://localhost:3000/orientation\").then(function(_arg) {\n        var pitch, roll, yaw;\n        pitch = _arg.pitch, yaw = _arg.yaw, roll = _arg.roll;\n        camera.rotation.x = pitch;\n        camera.rotation.y = yaw;\n        return camera.rotation.z = roll;\n      });\n    }, 1);\n  };\n\n}).call(this);\n",
       "type": "blob"
     }
   },
