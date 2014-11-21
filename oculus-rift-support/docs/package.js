@@ -214,6 +214,12 @@
       "mode": "100644",
       "type": "blob"
     },
+    "lib/oculus_rift/camera_control.coffee": {
+      "path": "lib/oculus_rift/camera_control.coffee",
+      "content": "\nmodule.exports = (camera) ->\n  # TODO: Switch to websockets or something a little better that ajaxin\n  setInterval ->\n    $.getJSON(\"http://localhost:3000/\").then ({position, quat}) ->\n      {x, y, z, w} = quat\n      camera.quaternion.set(x, y, z, w)\n      {x, y, z} = position\n      camera.position.set(x, y + 100, z + 200)\n  , 10\n",
+      "mode": "100644",
+      "type": "blob"
+    },
     "lib/oculus_rift/controls.js": {
       "path": "lib/oculus_rift/controls.js",
       "content": "/**\r\n * @author possan / http://possan.se/\r\n *\r\n * Oculus headtracking control\r\n * - use together with the oculus-rest project to get headtracking\r\n *   coordinates from the rift: http://github.com/possan/oculus-rest\r\n */\r\n\r\nTHREE.OculusControls = function ( object ) {\r\n\r\n  this.object = object;\r\n  this.target = new THREE.Vector3( 0, 0, 0 );\r\n\r\n\tthis.headquat = new THREE.Quaternion();\r\n\tthis.freeze = false;\r\n\r\n\tthis.loadAjaxJSON = function ( url, callback ) {\r\n\t\tvar xhr = new XMLHttpRequest();\r\n\t\txhr.onreadystatechange = function () {\r\n\t\t\tif ( xhr.readyState === xhr.DONE ) {\r\n\t\t\t\tif ( xhr.status === 200 || xhr.status === 0 ) {\r\n\t\t\t\t\tif ( xhr.responseText ) {\r\n\t\t\t\t\t\tvar json = JSON.parse( xhr.responseText );\r\n\t\t\t\t\t\tcallback( json );\r\n\t\t\t\t\t}\r\n\t\t\t\t}\r\n\t\t\t}\r\n\t\t};\r\n\t\txhr.open( \"GET\", url, true );\r\n\t\txhr.withCredentials = false;\r\n\t\txhr.send( null );\r\n\t};\r\n\r\n\tthis.gotCoordinates = function( r ) {\r\n\t\tthis.headquat.set(r.quat.x, r.quat.y, r.quat.z, r.quat.w);\r\n\t\tthis.queuePoll();\r\n\t}\r\n\r\n\tthis.pollOnce = function() {\r\n\t\tthis.loadAjaxJSON('http://localhost:50000', bind(this, this.gotCoordinates));\r\n\t}\r\n\r\n\tthis.queuePoll = function() {\r\n\t\tsetTimeout(bind(this, this.pollOnce), 10);\r\n\t}\r\n\r\n\tthis.update = function( delta ) {\r\n\t\tif ( this.freeze ) {\r\n\t\t\treturn;\r\n\t\t}\r\n\r\n\t\tthis.object.quaternion.multiply(this.headquat);\r\n\t};\r\n\r\n\tfunction bind( scope, fn ) {\r\n\t\treturn function () {\r\n\t\t\tfn.apply( scope, arguments );\r\n\t\t};\r\n\t};\r\n\r\n\tthis.connect = function() {\r\n\t\tthis.queuePoll();\r\n\t};\r\n};\r\n",
@@ -297,11 +303,6 @@
       "content": "Names = require \"../names\"\nDataLoader = require \"../data_loader\"\n\nDataLoader.names().then (data) ->\n  NamePicker = Names(data)\n\n  describe \"Names\", ->\n    it \"should pick at random\", ->\n      name = NamePicker.random()\n\n      console.log name\n      assert name\n\n    it \"should pick a scoped name\", ->\n      name = NamePicker.random\n        culture: \"Monster\"\n\n      console.log name\n      assert name\n\n    it \"should pick a name scoped by culture and gender\", ->\n      name = NamePicker.random\n        culture: \"Humanoid\"\n        gender: \"F\"\n\n      console.log name\n      assert name\n",
       "mode": "100644",
       "type": "blob"
-    },
-    "lib/oculus_rift/camera_control.coffee": {
-      "path": "lib/oculus_rift/camera_control.coffee",
-      "content": "\nmodule.exports = (camera) ->\n  # TODO: Switch to websockets or something a little better that ajaxin\n  setInterval ->\n    $.getJSON(\"http://localhost:3000/orientation\").then ({pitch, yaw, roll}) ->\n      camera.rotation.x = pitch\n      camera.rotation.y = yaw\n      camera.rotation.z = roll\n  , 1\n",
-      "mode": "100644"
     }
   },
   "distribution": {
@@ -333,6 +334,11 @@
     "lib/lights": {
       "path": "lib/lights",
       "content": "(function() {\n  exports.ambient = function() {\n    return new THREE.AmbientLight(0x101030);\n  };\n\n  exports.directional = function() {\n    var directionalLight;\n    directionalLight = new THREE.DirectionalLight(0xffeedd);\n    directionalLight.position.set(0, 0, 10);\n    return directionalLight;\n  };\n\n}).call(this);\n",
+      "type": "blob"
+    },
+    "lib/oculus_rift/camera_control": {
+      "path": "lib/oculus_rift/camera_control",
+      "content": "(function() {\n  module.exports = function(camera) {\n    return setInterval(function() {\n      return $.getJSON(\"http://localhost:3000/\").then(function(_arg) {\n        var position, quat, w, x, y, z;\n        position = _arg.position, quat = _arg.quat;\n        x = quat.x, y = quat.y, z = quat.z, w = quat.w;\n        camera.quaternion.set(x, y, z, w);\n        x = position.x, y = position.y, z = position.z;\n        return camera.position.set(x, y + 100, z + 200);\n      });\n    }, 10);\n  };\n\n}).call(this);\n",
       "type": "blob"
     },
     "lib/oculus_rift/controls": {
@@ -403,11 +409,6 @@
     "test/names": {
       "path": "test/names",
       "content": "(function() {\n  var DataLoader, Names;\n\n  Names = require(\"../names\");\n\n  DataLoader = require(\"../data_loader\");\n\n  DataLoader.names().then(function(data) {\n    var NamePicker;\n    NamePicker = Names(data);\n    return describe(\"Names\", function() {\n      it(\"should pick at random\", function() {\n        var name;\n        name = NamePicker.random();\n        console.log(name);\n        return assert(name);\n      });\n      it(\"should pick a scoped name\", function() {\n        var name;\n        name = NamePicker.random({\n          culture: \"Monster\"\n        });\n        console.log(name);\n        return assert(name);\n      });\n      return it(\"should pick a name scoped by culture and gender\", function() {\n        var name;\n        name = NamePicker.random({\n          culture: \"Humanoid\",\n          gender: \"F\"\n        });\n        console.log(name);\n        return assert(name);\n      });\n    });\n  });\n\n}).call(this);\n",
-      "type": "blob"
-    },
-    "lib/oculus_rift/camera_control": {
-      "path": "lib/oculus_rift/camera_control",
-      "content": "(function() {\n  module.exports = function(camera) {\n    return setInterval(function() {\n      return $.getJSON(\"http://localhost:3000/orientation\").then(function(_arg) {\n        var pitch, roll, yaw;\n        pitch = _arg.pitch, yaw = _arg.yaw, roll = _arg.roll;\n        camera.rotation.x = pitch;\n        camera.rotation.y = yaw;\n        return camera.rotation.z = roll;\n      });\n    }, 1);\n  };\n\n}).call(this);\n",
       "type": "blob"
     }
   },
