@@ -258,7 +258,7 @@
     },
     "pixie.cson": {
       "path": "pixie.cson",
-      "content": "version: \"0.2.3-pre.2\"\nentryPoint: \"main\"\nremoteDependencies: [\n  \"https://code.jquery.com/jquery-1.10.1.min.js\"\n  \"https://cdnjs.cloudflare.com/ajax/libs/three.js/r69/three.js\"\n]\ndependencies:\n  cornerstone: \"distri/cornerstone:v0.2.6\"\n  spreadsheet: \"distri/gdocs-spreadsheet:v0.1.0\"\n  stats: \"distri/stats.js:v0.11.0\"\n  util: \"distri/util:v0.1.1\"\n",
+      "content": "version: \"0.2.3-pre.3\"\nentryPoint: \"main\"\nremoteDependencies: [\n  \"https://code.jquery.com/jquery-1.10.1.min.js\"\n  \"https://cdnjs.cloudflare.com/ajax/libs/three.js/r69/three.js\"\n]\ndependencies:\n  cornerstone: \"distri/cornerstone:v0.2.6\"\n  spreadsheet: \"distri/gdocs-spreadsheet:v0.1.0\"\n  stats: \"distri/stats.js:v0.11.0\"\n  util: \"distri/util:v0.1.1\"\n",
       "mode": "100644",
       "type": "blob"
     },
@@ -373,7 +373,7 @@
     },
     "pixie": {
       "path": "pixie",
-      "content": "module.exports = {\"version\":\"0.2.3-pre.2\",\"entryPoint\":\"main\",\"remoteDependencies\":[\"https://code.jquery.com/jquery-1.10.1.min.js\",\"https://cdnjs.cloudflare.com/ajax/libs/three.js/r69/three.js\"],\"dependencies\":{\"cornerstone\":\"distri/cornerstone:v0.2.6\",\"spreadsheet\":\"distri/gdocs-spreadsheet:v0.1.0\",\"stats\":\"distri/stats.js:v0.11.0\",\"util\":\"distri/util:v0.1.1\"}};",
+      "content": "module.exports = {\"version\":\"0.2.3-pre.3\",\"entryPoint\":\"main\",\"remoteDependencies\":[\"https://code.jquery.com/jquery-1.10.1.min.js\",\"https://cdnjs.cloudflare.com/ajax/libs/three.js/r69/three.js\"],\"dependencies\":{\"cornerstone\":\"distri/cornerstone:v0.2.6\",\"spreadsheet\":\"distri/gdocs-spreadsheet:v0.1.0\",\"stats\":\"distri/stats.js:v0.11.0\",\"util\":\"distri/util:v0.1.1\"}};",
       "type": "blob"
     },
     "style": {
@@ -415,7 +415,7 @@
   "progenitor": {
     "url": "http://www.danielx.net/editor/"
   },
-  "version": "0.2.3-pre.2",
+  "version": "0.2.3-pre.3",
   "entryPoint": "main",
   "remoteDependencies": [
     "https://code.jquery.com/jquery-1.10.1.min.js",
