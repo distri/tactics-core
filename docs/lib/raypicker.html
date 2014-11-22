@@ -2,7 +2,7 @@
 
 <html>
 <head>
-  <title>lib/engine</title>
+  <title>lib/raypicker</title>
   <meta http-equiv="content-type" content="text/html; charset=UTF-8">
   <meta name="viewport" content="width=device-width, target-densitydpi=160dpi, initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
   <link rel="stylesheet" media="all" href="http://strd6.github.io/cdn/parallel/docco.css" />
@@ -18,7 +18,7 @@
               <div class="pilwrap">
                 <a class="pilcrow" href="#section-1">&#182;</a>
               </div>
-              <h1 id="engine">Engine</h1>
+              <h1 id="raypicker">Raypicker</h1>
 
             </div>
             <div class="content"><pre><code class="lang-coffeescript">
@@ -32,45 +32,49 @@
               <div class="pilwrap">
                 <a class="pilcrow" href="#section-2">&#182;</a>
               </div>
-              
+              <p>Select an object using raycasting in THREE.js</p>
+
             </div>
-            <div class="content"><pre><code class="lang-coffeescript">require <span class="string">"cornerstone"</span>
+            <div class="content"><pre><code class="lang-coffeescript">raycaster = <span class="keyword">new</span> THREE.Raycaster()
 
-module.<span class="function"><span class="title">exports</span></span> = (I={}, self={}) -&gt;
-  defaults I,
-    dt: <span class="number">1</span>/<span class="number">60</span>
-    t: <span class="number">0</span>
-    paused: <span class="literal">false</span>
-    running: <span class="literal">false</span>
+<span class="function"><span class="title">mouseEventToVector</span></span> = (event) -&gt;
+  {clientX:x, clientY:y} = event
 
-  <span class="function"><span class="title">step</span></span> = -&gt;
-    <span class="keyword">unless</span> I.paused
-      self.update?(I.t, I.dt)
-      I.t += I.dt
+  {
+    clientWidth:width
+    clientHeight:height
+    clientLeft:left
+    clientTop:top
+  } = event.currentTarget
 
-    self.render?(I.t, I.dt)
+  x = x - left
+  y = y - top
 
-  <span class="function"><span class="title">animLoop</span></span> = (timestamp) -&gt;
-    step()
+  vector = <span class="keyword">new</span> THREE.Vector3()
+  vector.set(
+    ( x / width ) * <span class="number">2</span> - <span class="number">1</span>,
+    - ( y / height ) * <span class="number">2</span> + <span class="number">1</span>,
+    <span class="number">0</span>
+  )
 
-    <span class="keyword">if</span> I.running
-      window.requestAnimationFrame(animLoop)
+  <span class="keyword">return</span> vector
 
-  <span class="keyword">if</span> I.running
-    window.requestAnimationFrame(animLoop)
+<span class="function"><span class="title">pick</span></span> = (vector, objects, camera) -&gt;
+  vector.unproject camera
+  vector.sub camera.position
+  vector.normalize()
 
-  extend self,
-    start: -&gt;
-      <span class="keyword">unless</span> I.running
-        I.running = <span class="literal">true</span>
-        animLoop()
+  raycaster.set camera.position, vector
 
-      <span class="keyword">return</span> self
+  intersects = raycaster.intersectObjects(objects, <span class="literal">true</span>)
 
-    stop: -&gt;
-      I.running = <span class="literal">false</span>
+module.<span class="function"><span class="title">exports</span></span> = (camera, objectsFn, handler) -&gt;
+  (event) -&gt;
+    event.preventDefault()
 
-      <span class="keyword">return</span> self</code></pre>
+    vector = mouseEventToVector(event)
+
+    handler pick(vector, objectsFn(), camera)</code></pre>
 </div>
         </li>
         

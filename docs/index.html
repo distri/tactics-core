@@ -43,10 +43,21 @@ module.exports =
   Character: require <span class="string">"./character"</span>
   Name: require <span class="string">"./names"</span>
   Loader: require <span class="string">"./data_loader"</span>
-  init: (data, update) -&gt;
-    applyStylesheet require(<span class="string">"./style"</span>)
+  init: (options={}) -&gt;
+    applyStylesheet require(<span class="string">"./style"</span>, <span class="string">"tactics-core"</span>)
 
-    Threesome.init(data, update)</code></pre>
+    Threesome(options)
+
+<span class="keyword">if</span> PACKAGE.name <span class="keyword">is</span> <span class="string">"ROOT"</span>
+  module.exports.init
+    data: {}
+    update: -&gt;
+    oculus: <span class="literal">false</span>
+    click: (results) -&gt;
+      <span class="keyword">if</span> results[<span class="number">0</span>]
+        {object} = results[<span class="number">0</span>]
+
+        object.material.color.setRGB rand(), rand(), rand()</code></pre>
 </div>
         </li>
         
@@ -54,7 +65,7 @@ module.exports =
   </div>
   <script src="https://code.jquery.com/jquery-1.10.1.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/coffee-script/1.6.3/coffee-script.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r69/three.min.js"></script><script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r69/three.js"></script><script>
   (function() {
   var ErrorReporter, bindUpdates, createEditor, exec, findInteractiveElements, readShebang, runners;
 
