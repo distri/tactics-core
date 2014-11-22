@@ -32,5 +32,9 @@ Engine
             I.running = true
             animLoop()
 
+          return self
+
         stop: ->
           I.running = false
+
+          return self

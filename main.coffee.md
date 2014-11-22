@@ -20,7 +20,7 @@ Data structures that make up the core of Tactis Game.
       module.exports.init
         data: {}
         update: ->
-        oculus: true
+        oculus: false
         click: (results) ->
           if results[0]
             {object} = results[0]

@@ -143,3 +143,7 @@ Three JS Starter Kit
           renderStats.end()
 
       engine.start()
+
+      extend engine,
+        scene: ->
+          scene
