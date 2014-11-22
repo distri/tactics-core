@@ -8,7 +8,7 @@ Cube
     module.exports = (x, y, z) ->
       material = new THREE.MeshBasicMaterial
 
-      grayness = rand() * 0.5 + 0.25
+      grayness = (y * 0.1) + 0.5 + rand() * 0.05
       material.color.setRGB grayness, grayness, grayness
 
       cube = new THREE.Mesh geometry, material
