@@ -20,7 +20,7 @@ window["distri/tactics-core:master"]({
     },
     "data_loader.coffee.md": {
       "path": "data_loader.coffee.md",
-      "content": "Data Loader\n===========\n\n    Spreadsheet = require \"spreadsheet\"\n    sheetData = null\n\n    loader = null\n    get = ->\n      return loader if loader\n\n      loader = Spreadsheet.load(\"0ArtCBkZR37MmdFJqbjloVEp1OFZLWDJ6M29OcXQ1WkE\")\n\n      return loader\n\n    module.exports =\n      characters: ->\n        get().then (data) ->\n          characterFromRemote(data.characters)\n      names: ->\n        get().then (data) ->\n          data.names.map (row) ->\n            name: row.name.trim()\n            gender: row.gender.trim()\n            culture: row.culture.trim()\n      get: get\n\n    characterDataTransform = (data) ->\n      extend data,\n        healthMax: data.healthmax\n        abilities: data.abilities.split(',')\n        passives: (data.passives ? \"\").split(',')\n        spriteName: data.sprite\n\n      delete data.healthmax\n      delete data.sprite\n\n      return data\n\n    characterFromRemote = (data) ->\n      console.log data\n      results = {}\n      data.forEach (datum) ->\n        results[datum.name] = characterDataTransform(datum)\n\n      return results\n",
+      "content": "Data Loader\n===========\n\n    Spreadsheet = require \"spreadsheet\"\n    sheetData = null\n\n    loader = null\n    get = ->\n      return loader if loader\n\n      loader = Spreadsheet.load(\"0ArtCBkZR37MmdFJqbjloVEp1OFZLWDJ6M29OcXQ1WkE\")\n\n      return loader\n\n    module.exports =\n      characters: ->\n        get().then (data) ->\n          characterFromRemote(data.characters)\n      names: ->\n        get().then (data) ->\n          data.names.map (row) ->\n            name: row.name.trim()\n            gender: row.gender.trim()\n            culture: row.culture.trim()\n      get: get\n      refresh: ->\n        loader = null\n\n        return get()\n\n    characterDataTransform = (data) ->\n      extend data,\n        healthMax: data.healthmax\n        abilities: data.abilities.split(',')\n        passives: (data.passives ? \"\").split(',')\n        spriteName: data.sprite\n\n      delete data.healthmax\n      delete data.sprite\n\n      return data\n\n    characterFromRemote = (data) ->\n      console.log data\n      results = {}\n      data.forEach (datum) ->\n        results[datum.name] = characterDataTransform(datum)\n\n      return results\n",
       "mode": "100644",
       "type": "blob"
     },
@@ -92,7 +92,7 @@ window["distri/tactics-core:master"]({
     },
     "pixie.cson": {
       "path": "pixie.cson",
-      "content": "version: \"0.2.3-pre.5\"\nentryPoint: \"main\"\nremoteDependencies: [\n  \"https://code.jquery.com/jquery-1.10.1.min.js\"\n  \"https://cdnjs.cloudflare.com/ajax/libs/three.js/r69/three.js\"\n]\ndependencies:\n  cornerstone: \"distri/cornerstone:v0.2.6\"\n  spreadsheet: \"distri/gdocs-spreadsheet:v0.1.0\"\n  stats: \"distri/stats.js:v0.11.0\"\n  util: \"distri/util:v0.1.1\"\n",
+      "content": "version: \"0.2.3-pre.6\"\nentryPoint: \"main\"\nremoteDependencies: [\n  \"https://code.jquery.com/jquery-1.10.1.min.js\"\n  \"https://cdnjs.cloudflare.com/ajax/libs/three.js/r69/three.js\"\n]\ndependencies:\n  cornerstone: \"distri/cornerstone:v0.2.6\"\n  spreadsheet: \"distri/gdocs-spreadsheet:v0.1.0\"\n  stats: \"distri/stats.js:v0.11.0\"\n  util: \"distri/util:v0.1.1\"\n",
       "mode": "100644",
       "type": "blob"
     },
@@ -147,7 +147,7 @@ window["distri/tactics-core:master"]({
     },
     "data_loader": {
       "path": "data_loader",
-      "content": "(function() {\n  var Spreadsheet, characterDataTransform, characterFromRemote, get, loader, sheetData;\n\n  Spreadsheet = require(\"spreadsheet\");\n\n  sheetData = null;\n\n  loader = null;\n\n  get = function() {\n    if (loader) {\n      return loader;\n    }\n    loader = Spreadsheet.load(\"0ArtCBkZR37MmdFJqbjloVEp1OFZLWDJ6M29OcXQ1WkE\");\n    return loader;\n  };\n\n  module.exports = {\n    characters: function() {\n      return get().then(function(data) {\n        return characterFromRemote(data.characters);\n      });\n    },\n    names: function() {\n      return get().then(function(data) {\n        return data.names.map(function(row) {\n          return {\n            name: row.name.trim(),\n            gender: row.gender.trim(),\n            culture: row.culture.trim()\n          };\n        });\n      });\n    },\n    get: get\n  };\n\n  characterDataTransform = function(data) {\n    var _ref;\n    extend(data, {\n      healthMax: data.healthmax,\n      abilities: data.abilities.split(','),\n      passives: ((_ref = data.passives) != null ? _ref : \"\").split(','),\n      spriteName: data.sprite\n    });\n    delete data.healthmax;\n    delete data.sprite;\n    return data;\n  };\n\n  characterFromRemote = function(data) {\n    var results;\n    console.log(data);\n    results = {};\n    data.forEach(function(datum) {\n      return results[datum.name] = characterDataTransform(datum);\n    });\n    return results;\n  };\n\n}).call(this);\n",
+      "content": "(function() {\n  var Spreadsheet, characterDataTransform, characterFromRemote, get, loader, sheetData;\n\n  Spreadsheet = require(\"spreadsheet\");\n\n  sheetData = null;\n\n  loader = null;\n\n  get = function() {\n    if (loader) {\n      return loader;\n    }\n    loader = Spreadsheet.load(\"0ArtCBkZR37MmdFJqbjloVEp1OFZLWDJ6M29OcXQ1WkE\");\n    return loader;\n  };\n\n  module.exports = {\n    characters: function() {\n      return get().then(function(data) {\n        return characterFromRemote(data.characters);\n      });\n    },\n    names: function() {\n      return get().then(function(data) {\n        return data.names.map(function(row) {\n          return {\n            name: row.name.trim(),\n            gender: row.gender.trim(),\n            culture: row.culture.trim()\n          };\n        });\n      });\n    },\n    get: get,\n    refresh: function() {\n      loader = null;\n      return get();\n    }\n  };\n\n  characterDataTransform = function(data) {\n    var _ref;\n    extend(data, {\n      healthMax: data.healthmax,\n      abilities: data.abilities.split(','),\n      passives: ((_ref = data.passives) != null ? _ref : \"\").split(','),\n      spriteName: data.sprite\n    });\n    delete data.healthmax;\n    delete data.sprite;\n    return data;\n  };\n\n  characterFromRemote = function(data) {\n    var results;\n    console.log(data);\n    results = {};\n    data.forEach(function(datum) {\n      return results[datum.name] = characterDataTransform(datum);\n    });\n    return results;\n  };\n\n}).call(this);\n",
       "type": "blob"
     },
     "lib/cube": {
@@ -207,7 +207,7 @@ window["distri/tactics-core:master"]({
     },
     "pixie": {
       "path": "pixie",
-      "content": "module.exports = {\"version\":\"0.2.3-pre.5\",\"entryPoint\":\"main\",\"remoteDependencies\":[\"https://code.jquery.com/jquery-1.10.1.min.js\",\"https://cdnjs.cloudflare.com/ajax/libs/three.js/r69/three.js\"],\"dependencies\":{\"cornerstone\":\"distri/cornerstone:v0.2.6\",\"spreadsheet\":\"distri/gdocs-spreadsheet:v0.1.0\",\"stats\":\"distri/stats.js:v0.11.0\",\"util\":\"distri/util:v0.1.1\"}};",
+      "content": "module.exports = {\"version\":\"0.2.3-pre.6\",\"entryPoint\":\"main\",\"remoteDependencies\":[\"https://code.jquery.com/jquery-1.10.1.min.js\",\"https://cdnjs.cloudflare.com/ajax/libs/three.js/r69/three.js\"],\"dependencies\":{\"cornerstone\":\"distri/cornerstone:v0.2.6\",\"spreadsheet\":\"distri/gdocs-spreadsheet:v0.1.0\",\"stats\":\"distri/stats.js:v0.11.0\",\"util\":\"distri/util:v0.1.1\"}};",
       "type": "blob"
     },
     "style": {
@@ -249,7 +249,7 @@ window["distri/tactics-core:master"]({
   "progenitor": {
     "url": "http://www.danielx.net/editor/"
   },
-  "version": "0.2.3-pre.5",
+  "version": "0.2.3-pre.6",
   "entryPoint": "main",
   "remoteDependencies": [
     "https://code.jquery.com/jquery-1.10.1.min.js",
