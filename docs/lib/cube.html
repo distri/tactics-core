@@ -41,7 +41,7 @@ geometry = <span class="keyword">new</span> THREE.BoxGeometry(CUBE_SIZE, CUBE_SI
 module.<span class="function"><span class="title">exports</span></span> = (x, y, z) -&gt;
   material = <span class="keyword">new</span> THREE.MeshBasicMaterial
 
-  grayness = rand() * <span class="number">0.5</span> + <span class="number">0.25</span>
+  grayness = (y * <span class="number">0.1</span>) + <span class="number">0.5</span> + rand() * <span class="number">0.05</span>
   material.color.setRGB grayness, grayness, grayness
 
   cube = <span class="keyword">new</span> THREE.Mesh geometry, material

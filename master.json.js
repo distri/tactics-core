@@ -26,7 +26,7 @@ window["distri/tactics-core:master"]({
     },
     "lib/cube.coffee.md": {
       "path": "lib/cube.coffee.md",
-      "content": "Cube\n====\n\n    CUBE_SIZE = 1\n\n    geometry = new THREE.BoxGeometry(CUBE_SIZE, CUBE_SIZE, CUBE_SIZE)\n\n    module.exports = (x, y, z) ->\n      material = new THREE.MeshBasicMaterial\n\n      grayness = rand() * 0.5 + 0.25\n      material.color.setRGB grayness, grayness, grayness\n\n      cube = new THREE.Mesh geometry, material\n      cube.position.set(x * CUBE_SIZE, (y - 0.5) * CUBE_SIZE, z * CUBE_SIZE)\n\n      return cube\n",
+      "content": "Cube\n====\n\n    CUBE_SIZE = 1\n\n    geometry = new THREE.BoxGeometry(CUBE_SIZE, CUBE_SIZE, CUBE_SIZE)\n\n    module.exports = (x, y, z) ->\n      material = new THREE.MeshBasicMaterial\n\n      grayness = (y * 0.1) + 0.5 + rand() * 0.05\n      material.color.setRGB grayness, grayness, grayness\n\n      cube = new THREE.Mesh geometry, material\n      cube.position.set(x * CUBE_SIZE, (y - 0.5) * CUBE_SIZE, z * CUBE_SIZE)\n\n      return cube\n",
       "mode": "100644",
       "type": "blob"
     },
@@ -92,7 +92,7 @@ window["distri/tactics-core:master"]({
     },
     "pixie.cson": {
       "path": "pixie.cson",
-      "content": "version: \"0.2.3-pre.7\"\nentryPoint: \"main\"\nremoteDependencies: [\n  \"https://code.jquery.com/jquery-1.10.1.min.js\"\n  \"https://cdnjs.cloudflare.com/ajax/libs/three.js/r69/three.js\"\n]\ndependencies:\n  cornerstone: \"distri/cornerstone:v0.2.6\"\n  spreadsheet: \"distri/gdocs-spreadsheet:v0.1.0\"\n  stats: \"distri/stats.js:v0.11.0\"\n  util: \"distri/util:v0.1.1\"\n",
+      "content": "version: \"0.2.3-pre.8\"\nentryPoint: \"main\"\nremoteDependencies: [\n  \"https://code.jquery.com/jquery-1.10.1.min.js\"\n  \"https://cdnjs.cloudflare.com/ajax/libs/three.js/r69/three.js\"\n]\ndependencies:\n  cornerstone: \"distri/cornerstone:v0.2.6\"\n  spreadsheet: \"distri/gdocs-spreadsheet:v0.1.0\"\n  stats: \"distri/stats.js:v0.11.0\"\n  util: \"distri/util:v0.1.1\"\n",
       "mode": "100644",
       "type": "blob"
     },
@@ -152,7 +152,7 @@ window["distri/tactics-core:master"]({
     },
     "lib/cube": {
       "path": "lib/cube",
-      "content": "(function() {\n  var CUBE_SIZE, geometry;\n\n  CUBE_SIZE = 1;\n\n  geometry = new THREE.BoxGeometry(CUBE_SIZE, CUBE_SIZE, CUBE_SIZE);\n\n  module.exports = function(x, y, z) {\n    var cube, grayness, material;\n    material = new THREE.MeshBasicMaterial;\n    grayness = rand() * 0.5 + 0.25;\n    material.color.setRGB(grayness, grayness, grayness);\n    cube = new THREE.Mesh(geometry, material);\n    cube.position.set(x * CUBE_SIZE, (y - 0.5) * CUBE_SIZE, z * CUBE_SIZE);\n    return cube;\n  };\n\n}).call(this);\n",
+      "content": "(function() {\n  var CUBE_SIZE, geometry;\n\n  CUBE_SIZE = 1;\n\n  geometry = new THREE.BoxGeometry(CUBE_SIZE, CUBE_SIZE, CUBE_SIZE);\n\n  module.exports = function(x, y, z) {\n    var cube, grayness, material;\n    material = new THREE.MeshBasicMaterial;\n    grayness = (y * 0.1) + 0.5 + rand() * 0.05;\n    material.color.setRGB(grayness, grayness, grayness);\n    cube = new THREE.Mesh(geometry, material);\n    cube.position.set(x * CUBE_SIZE, (y - 0.5) * CUBE_SIZE, z * CUBE_SIZE);\n    return cube;\n  };\n\n}).call(this);\n",
       "type": "blob"
     },
     "lib/engine": {
@@ -207,7 +207,7 @@ window["distri/tactics-core:master"]({
     },
     "pixie": {
       "path": "pixie",
-      "content": "module.exports = {\"version\":\"0.2.3-pre.7\",\"entryPoint\":\"main\",\"remoteDependencies\":[\"https://code.jquery.com/jquery-1.10.1.min.js\",\"https://cdnjs.cloudflare.com/ajax/libs/three.js/r69/three.js\"],\"dependencies\":{\"cornerstone\":\"distri/cornerstone:v0.2.6\",\"spreadsheet\":\"distri/gdocs-spreadsheet:v0.1.0\",\"stats\":\"distri/stats.js:v0.11.0\",\"util\":\"distri/util:v0.1.1\"}};",
+      "content": "module.exports = {\"version\":\"0.2.3-pre.8\",\"entryPoint\":\"main\",\"remoteDependencies\":[\"https://code.jquery.com/jquery-1.10.1.min.js\",\"https://cdnjs.cloudflare.com/ajax/libs/three.js/r69/three.js\"],\"dependencies\":{\"cornerstone\":\"distri/cornerstone:v0.2.6\",\"spreadsheet\":\"distri/gdocs-spreadsheet:v0.1.0\",\"stats\":\"distri/stats.js:v0.11.0\",\"util\":\"distri/util:v0.1.1\"}};",
       "type": "blob"
     },
     "style": {
@@ -249,7 +249,7 @@ window["distri/tactics-core:master"]({
   "progenitor": {
     "url": "http://www.danielx.net/editor/"
   },
-  "version": "0.2.3-pre.7",
+  "version": "0.2.3-pre.8",
   "entryPoint": "main",
   "remoteDependencies": [
     "https://code.jquery.com/jquery-1.10.1.min.js",
