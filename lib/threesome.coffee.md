@@ -78,6 +78,7 @@ Three JS Starter Kit
         geometry.vertices.push(end)
 
         line = new THREE.Line(geometry, material)
+        line.tag = "axis"
         scene.add line
 
       addLine(
@@ -147,3 +148,5 @@ Three JS Starter Kit
       extend engine,
         scene: ->
           scene
+        camera: ->
+          camera
