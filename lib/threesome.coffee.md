@@ -150,4 +150,6 @@ Three JS Starter Kit
           scene
         camera: ->
           camera
+        renderer: ->
+          renderer
         Cube: Cube
