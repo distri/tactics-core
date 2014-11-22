@@ -65,8 +65,12 @@ module.<span class="function"><span class="title">exports</span></span> = (I={},
         I.running = <span class="literal">true</span>
         animLoop()
 
+      <span class="keyword">return</span> self
+
     stop: -&gt;
-      I.running = <span class="literal">false</span></code></pre>
+      I.running = <span class="literal">false</span>
+
+      <span class="keyword">return</span> self</code></pre>
 </div>
         </li>
         
