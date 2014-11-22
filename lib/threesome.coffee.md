@@ -5,7 +5,7 @@ Three JS Starter Kit
     Stats = require "stats"
     Raypicker = require "./raypicker"
 
-    require "./occulus_rift_effect"
+    require "./oculus_rift/effect"
 
     initCamera = ->
       aspectRatio = window.innerWidth / window.innerHeight
@@ -31,10 +31,10 @@ Three JS Starter Kit
         [0...10].forEach (z) ->
           scene.add Cube(x, z)
 
-    bindWindowEvents = (camera, renderer) ->
+    bindWindowEvents = (camera, renderer, effect) ->
       resize = ->
         renderer.setSize window.innerWidth, window.innerHeight
-        # TODO: Probably need to resize effect in here too...
+        effect.setSize window.innerWidth, window.innerHeight
 
         camera.aspect = window.innerWidth / window.innerHeight
         camera.updateProjectionMatrix()
@@ -110,21 +110,25 @@ Three JS Starter Kit
       camera = initCamera()
       scene = initScene()
 
+      camera.lookAt scene.position
+
       initFloor(scene)
       debuggingLines(scene)
 
       renderer = new THREE.WebGLRenderer()
 
-      bindWindowEvents(camera, renderer)
+      if options.oculus # Oculus Rift
+        effect = new THREE.OculusRiftEffect(renderer, { worldScale: 1 })
+        effect.setSize( window.innerWidth, window.innerHeight )
+
+        require("./oculus_rift/camera_control")(camera)
+      else
+        effect = renderer
+
+      bindWindowEvents(camera, renderer, effect)
       bindClickEvent camera, renderer, click, clickObjectsFn
 
       document.body.appendChild renderer.domElement
-
-      if options.occulus # Occulus Rift
-        effect = new THREE.OculusRiftEffect(renderer, { worldScale: 1 })
-        effect.setSize( window.innerWidth, window.innerHeight )
-      else
-        effect = renderer
 
       engine = Engine data.engine,
         update: (t, dt) ->
@@ -134,10 +138,12 @@ Three JS Starter Kit
           updateStats.end()
 
         render: (t, dt) ->
-          camera.lookAt scene.position
-
           renderStats.begin()
           effect.render scene, camera
           renderStats.end()
 
       engine.start()
+
+      extend engine,
+        scene: ->
+          scene
