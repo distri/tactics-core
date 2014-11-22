@@ -23,6 +23,10 @@ Data Loader
             gender: row.gender.trim()
             culture: row.culture.trim()
       get: get
+      refresh: ->
+        loader = null
+
+        return get()
 
     characterDataTransform = (data) ->
       extend data,
