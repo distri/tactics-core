@@ -13,7 +13,7 @@ Three JS Starter Kit
       aspectRatio = window.innerWidth / window.innerHeight
 
       camera = new THREE.PerspectiveCamera(45, aspectRatio, 1, 2000)
-      camera.position.set 0, 100, 200
+      camera.position.set 0, 10, 20
 
       return camera
 
@@ -29,7 +29,7 @@ Three JS Starter Kit
     initFloor = (scene) ->
       [0...10].forEach (x) ->
         [0...10].forEach (z) ->
-          scene.add Cube(x, z)
+          scene.add Cube(x, 0, z)
 
     bindWindowEvents = (camera, renderer, effect) ->
       resize = ->
@@ -83,19 +83,19 @@ Three JS Starter Kit
 
       addLine(
         new THREE.Vector3(0, 0, 0)
-        new THREE.Vector3(100, 0, 0)
+        new THREE.Vector3(10, 0, 0)
         color: 0xff0000
       )
 
       addLine(
         new THREE.Vector3(0, 0, 0)
-        new THREE.Vector3(0, 100, 0)
+        new THREE.Vector3(0, 10, 0)
         color: 0x00ff00
       )
 
       addLine(
         new THREE.Vector3(0, 0, 0)
-        new THREE.Vector3(0, 0, 100)
+        new THREE.Vector3(0, 0, 10)
         color: 0x0000ff
       )
 
