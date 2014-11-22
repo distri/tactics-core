@@ -5,6 +5,8 @@ Three JS Starter Kit
     Stats = require "stats"
     Raypicker = require "./raypicker"
 
+    Cube = require "./cube"
+
     require "./oculus_rift/effect"
 
     initCamera = ->
@@ -25,8 +27,6 @@ Three JS Starter Kit
       return scene
 
     initFloor = (scene) ->
-      Cube = require "./cube"
-
       [0...10].forEach (x) ->
         [0...10].forEach (z) ->
           scene.add Cube(x, z)
@@ -150,3 +150,4 @@ Three JS Starter Kit
           scene
         camera: ->
           camera
+        Cube: Cube
