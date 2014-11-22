@@ -46,7 +46,7 @@ require <span class="string">"./oculus_rift/effect"</span>
   aspectRatio = window.innerWidth / window.innerHeight
 
   camera = <span class="keyword">new</span> THREE.PerspectiveCamera(<span class="number">45</span>, aspectRatio, <span class="number">1</span>, <span class="number">2000</span>)
-  camera.position.set <span class="number">0</span>, <span class="number">100</span>, <span class="number">200</span>
+  camera.position.set <span class="number">0</span>, <span class="number">10</span>, <span class="number">20</span>
 
   <span class="keyword">return</span> camera
 
@@ -62,7 +62,7 @@ require <span class="string">"./oculus_rift/effect"</span>
 <span class="function"><span class="title">initFloor</span></span> = (scene) -&gt;
   [<span class="number">0.</span>.<span class="number">.10</span>].forEach (x) -&gt;
     [<span class="number">0.</span>.<span class="number">.10</span>].forEach (z) -&gt;
-      scene.add Cube(x, z)
+      scene.add Cube(x, <span class="number">0</span>, z)
 
 <span class="function"><span class="title">bindWindowEvents</span></span> = (camera, renderer, effect) -&gt;
   <span class="function"><span class="title">resize</span></span> = -&gt;
@@ -116,19 +116,19 @@ require <span class="string">"./oculus_rift/effect"</span>
 
   addLine(
     <span class="keyword">new</span> THREE.Vector3(<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>)
-    <span class="keyword">new</span> THREE.Vector3(<span class="number">100</span>, <span class="number">0</span>, <span class="number">0</span>)
+    <span class="keyword">new</span> THREE.Vector3(<span class="number">10</span>, <span class="number">0</span>, <span class="number">0</span>)
     color: <span class="number">0xff0000</span>
   )
 
   addLine(
     <span class="keyword">new</span> THREE.Vector3(<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>)
-    <span class="keyword">new</span> THREE.Vector3(<span class="number">0</span>, <span class="number">100</span>, <span class="number">0</span>)
+    <span class="keyword">new</span> THREE.Vector3(<span class="number">0</span>, <span class="number">10</span>, <span class="number">0</span>)
     color: <span class="number">0x00ff00</span>
   )
 
   addLine(
     <span class="keyword">new</span> THREE.Vector3(<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>)
-    <span class="keyword">new</span> THREE.Vector3(<span class="number">0</span>, <span class="number">0</span>, <span class="number">100</span>)
+    <span class="keyword">new</span> THREE.Vector3(<span class="number">0</span>, <span class="number">0</span>, <span class="number">10</span>)
     color: <span class="number">0x0000ff</span>
   )
 

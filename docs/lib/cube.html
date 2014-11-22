@@ -34,18 +34,18 @@
               </div>
               
             </div>
-            <div class="content"><pre><code class="lang-coffeescript">CUBE_SIZE = <span class="number">10</span>
+            <div class="content"><pre><code class="lang-coffeescript">CUBE_SIZE = <span class="number">1</span>
 
 geometry = <span class="keyword">new</span> THREE.BoxGeometry(CUBE_SIZE, CUBE_SIZE, CUBE_SIZE)
 
-module.<span class="function"><span class="title">exports</span></span> = (x, z) -&gt;
+module.<span class="function"><span class="title">exports</span></span> = (x, y, z) -&gt;
   material = <span class="keyword">new</span> THREE.MeshBasicMaterial
 
   grayness = rand() * <span class="number">0.5</span> + <span class="number">0.25</span>
   material.color.setRGB grayness, grayness, grayness
 
   cube = <span class="keyword">new</span> THREE.Mesh geometry, material
-  cube.position.set(x * CUBE_SIZE, -CUBE_SIZE/<span class="number">2</span>, z * CUBE_SIZE)
+  cube.position.set(x * CUBE_SIZE, (y - <span class="number">0.5</span>) * CUBE_SIZE, z * CUBE_SIZE)
 
   <span class="keyword">return</span> cube</code></pre>
 </div>
