@@ -38,6 +38,8 @@
 Stats = require <span class="string">"stats"</span>
 Raypicker = require <span class="string">"./raypicker"</span>
 
+Cube = require <span class="string">"./cube"</span>
+
 require <span class="string">"./oculus_rift/effect"</span>
 
 <span class="function"><span class="title">initCamera</span></span> = -&gt;
@@ -58,8 +60,6 @@ require <span class="string">"./oculus_rift/effect"</span>
   <span class="keyword">return</span> scene
 
 <span class="function"><span class="title">initFloor</span></span> = (scene) -&gt;
-  Cube = require <span class="string">"./cube"</span>
-
   [<span class="number">0.</span>.<span class="number">.10</span>].forEach (x) -&gt;
     [<span class="number">0.</span>.<span class="number">.10</span>].forEach (z) -&gt;
       scene.add Cube(x, z)
@@ -182,7 +182,8 @@ module.<span class="function"><span class="title">exports</span></span> = (optio
     scene: -&gt;
       scene
     camera: -&gt;
-      camera</code></pre>
+      camera
+    Cube: Cube</code></pre>
 </div>
         </li>
         
